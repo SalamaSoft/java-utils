@@ -59,6 +59,11 @@ public class HttpClientUtil {
 	
 	//private static ClientConnectionManager connectionManager;
 	private static PoolingClientConnectionManager connectionManager;
+	
+	public static PoolingClientConnectionManager getConnectionManager() {
+		return connectionManager;
+	}
+
 	private static HttpParams httpParams;
 	
 	//20K byte
