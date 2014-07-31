@@ -5,7 +5,8 @@
 	<property name="jdk.dir"         value="C:\jdk1.6.0_20"/>
 	-->
 	<property name="src.dir"         value="src"/>
-	<property name="bin.dir"         value="bin"/>
+	<property name="srcThumbnail.dir"         value="srcThumbnailator"/>
+		<property name="bin.dir"         value="bin"/>
 	<property name="bintemp.dir"     value="binTemp"/>
 	<property name="jar.name"        value="EasyImageUtil.jar"/>
 	
@@ -23,6 +24,8 @@
 	<target name="copySrc">
 		<copy todir="${bintemp.dir}" overwrite="true" verbose="false" >
 			<fileset dir="${src.dir}" >
+			</fileset>
+			<fileset dir="${srcThumbnail.dir}" >
 			</fileset>
 		</copy>
 	</target>

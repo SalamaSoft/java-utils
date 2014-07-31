@@ -1,14 +1,17 @@
 package com.salama.util.easyimage.junittest;
 
+import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
 import com.salama.util.easyimage.ImageUtil;
+import com.salama.util.easyimage.ImageUtil.ImageType;
 
 public class ImageUtilTest {
 
@@ -164,7 +167,7 @@ public class ImageUtilTest {
 		}
 	}
 	
-	@Test
+	@Ignore
 	public void testCreatePngImage11() {
 		try {
 			ImageUtil.createImage(
@@ -210,6 +213,25 @@ public class ImageUtilTest {
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testImage3() {
+		try {
+			File imageFile = new File("testImages/test3.jpg");
+			ImageType imgType = ImageUtil.getImageType(imageFile);
+			System.out.println("imgType:" + imgType);
+			
+			File imageFileOutput = new File("testImages/test3_out.jpg");
+			
+			InputStream input = new FileInputStream(imageFile);
+			Point imgSize = ImageUtil.getImageSize(imageFile);
+			ImageUtil.createImage(input, imgSize.x, imgSize.y, 0, 128, imageFileOutput, false, "jpg");
+			input.close();
+			
+		} catch(Throwable e) {
 			e.printStackTrace();
 		}
 	}

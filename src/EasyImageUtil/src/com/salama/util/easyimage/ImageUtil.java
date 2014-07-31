@@ -1,5 +1,6 @@
 package com.salama.util.easyimage;
 
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -152,20 +153,30 @@ public class ImageUtil {
 		createImage(builder, originalWidth, originalHeight, toWidth, toHeight, outputFile, imgAllowEmptyRegion, format);
 	}
 
-	public static void createImage(InputStream originalImage, 
+	public static void createImage(InputStream originalImage, int originalWidth, int originalHeight,
 			int toWidth, int toHeight, File outputFile, String format) throws IOException {
-		createImage(originalImage, toWidth, toHeight, outputFile, false, format);
+		createImage(originalImage, originalWidth, originalHeight, toWidth, toHeight, outputFile, false, format);
 	}
 	
-	public static void createImage(InputStream originalImage, 
+	public static void createImage(InputStream originalImage, int originalWidth, int originalHeight,
 			int toWidth, int toHeight, File outputFile, boolean imgAllowEmptyRegion, String format) throws IOException {
 		Builder<? extends InputStream> builder = Thumbnails.of(originalImage);
 		
-		BufferedImage img = ImageIO.read(originalImage);
-		int originalWidth =  img.getWidth();
-		int originalHeight = img.getHeight();
+//		BufferedImage img = ImageIO.read(originalImage);
+//		int originalWidth =  img.getWidth();
+//		int originalHeight = img.getHeight();
 
 		createImage(builder, originalWidth, originalHeight, toWidth, toHeight, outputFile, imgAllowEmptyRegion, format);
+	}
+	
+	public static Point getImageSize(File originalImage) throws IOException {
+		BufferedImage img = ImageIO.read(originalImage);
+		return new Point(img.getWidth(), img.getHeight());
+	}
+	
+	public static Point getImageSize(InputStream originalImage) throws IOException {
+		BufferedImage img = ImageIO.read(originalImage);
+		return new Point(img.getWidth(), img.getHeight());
 	}
 	
 	protected static void createImage(Builder<?> builder, int originalWidth, int originalHeight, 
