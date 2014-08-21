@@ -59,6 +59,11 @@
 		depends="createBinTmp,copyClass,deleteJUnitClass,deleteVssFile,deleteSVN"> 
 		<jar jarfile="${jar.name}" basedir="${bintemp.dir}" />
 		<delete dir="${bintemp.dir}"></delete>
+		<copy todir="../ReleaseJars" overwrite="true" verbose="false">
+		    <fileset dir="./">
+		        <include name="${jar.name}"></include>
+		    </fileset> 
+		</copy>
 	</target>
 	
 </project>

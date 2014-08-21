@@ -357,6 +357,8 @@ public class AuthManager4Redis implements AppAuthUserDataManager {
 			jedis.hset(authTicketRedisKey, COL_NAME_ROLE, authInfo.getRole());
 			jedis.hset(authTicketRedisKey, COL_NAME_EXPIRING_TIME, Long.toString(authInfo.getExpiringTime()));
 			
+			int expiredSeconds = (int) ((authInfo.getExpiringTime() - System.currentTimeMillis()) / 1000); 
+			jedis.expire(authTicketRedisKey, expiredSeconds);
 		} finally {
 			_jedisPool.returnResource(jedis);
 		}
