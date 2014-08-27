@@ -313,7 +313,8 @@ public class AuthManager4Redis implements AppAuthUserDataManager {
 			
 			String authTicketRedisKey = getAuthRedisKey(authTicket);
 			
-			jedis.hdel(authTicketRedisKey, COL_NAME_USER_ID, COL_NAME_ROLE, COL_NAME_EXPIRING_TIME);
+			//jedis.hdel(authTicketRedisKey, COL_NAME_USER_ID, COL_NAME_ROLE, COL_NAME_EXPIRING_TIME);
+			jedis.del(authTicketRedisKey);
 			
 		} finally {
 			_jedisPool.returnResource(jedis);
