@@ -5,10 +5,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import com.salama.service.clouddata.core.AppAuthUserDataManager;
 import com.salama.service.clouddata.core.AppException;
@@ -22,7 +24,8 @@ public class AuthManager4Redis implements AppAuthUserDataManager {
 	
 	//private MessageDigest _md5 = null;
 	
-	private volatile boolean _isInCleanOldCachedEntry = false;
+	//private volatile boolean _isInCleanOldCachedEntry = false;
+	private AtomicBoolean _isInCleanOldCachedEntry = new AtomicBoolean(false);
 	
 	/**
 	 * key:authTicket value:AuthUserInfo
@@ -164,7 +167,12 @@ public class AuthManager4Redis implements AppAuthUserDataManager {
 			
 			return authInfo;
 		} else {
-			return authInfo;
+			if(authInfo.getExpiringTime() <= System.currentTimeMillis()) {
+				deleteAuthInfo(authTicket);
+				return null;
+			} else {
+				return authInfo;
+			}
 		}
 	}
 
@@ -245,32 +253,43 @@ public class AuthManager4Redis implements AppAuthUserDataManager {
 	}
 	
 	private void startCleanOldCachedEntry() {
+		if(_isInCleanOldCachedEntry.get()) {
+			return;
+		}
+		
 		Thread t = new Thread(new Runnable() {
 			
 			@Override
 			public void run() {
+				/*
 				if(_isInCleanOldCachedEntry) {
 					return;
 				}
-
 				_isInCleanOldCachedEntry = true;
-				
-				int deleteCount = _authTicketList.size() - _maxMapCacheCount;
-				if(deleteCount > 0) {
-					String authTicket = null;
-					
-					for(int i = 0; i < deleteCount; i++) {
-						authTicket = _authTicketList.poll();
-						
-						if(authTicket == null) {
-							break;
-						} else {
-							_authTicketMap.remove(authTicket);
-						}
-					}
+				*/
+				if(!_isInCleanOldCachedEntry.compareAndSet(false, true)) {
+					return;
 				}
 				
-				_isInCleanOldCachedEntry = false;
+				try {
+					int deleteCount = _authTicketList.size() - _maxMapCacheCount;
+					if(deleteCount > 0) {
+						String authTicket = null;
+						
+						for(int i = 0; i < deleteCount; i++) {
+							authTicket = _authTicketList.poll();
+							
+							if(authTicket == null) {
+								break;
+							} else {
+								_authTicketMap.remove(authTicket);
+							}
+						}
+					}
+				} finally {
+					//_isInCleanOldCachedEntry = false;
+					_isInCleanOldCachedEntry.set(false);
+				}
 			}
 		});
 		
@@ -299,7 +318,13 @@ public class AuthManager4Redis implements AppAuthUserDataManager {
 			jedis.hset(authTicketRedisKey, COL_NAME_ROLE, authInfo.getRole());
 			jedis.hset(authTicketRedisKey, COL_NAME_EXPIRING_TIME, Long.toString(authInfo.getExpiringTime()));
 			
+			int expiredSeconds = (int) ((authInfo.getExpiringTime() - System.currentTimeMillis()) / 1000); 
+			jedis.expire(authTicketRedisKey, expiredSeconds);
+			
 			return authInfo;
+		} catch(JedisConnectionException e) {
+			_jedisPool.returnBrokenResource(jedis);
+			return null;
 		} finally {
 			_jedisPool.returnResource(jedis);
 		}
@@ -316,6 +341,8 @@ public class AuthManager4Redis implements AppAuthUserDataManager {
 			//jedis.hdel(authTicketRedisKey, COL_NAME_USER_ID, COL_NAME_ROLE, COL_NAME_EXPIRING_TIME);
 			jedis.del(authTicketRedisKey);
 			
+		} catch(JedisConnectionException e) {
+			_jedisPool.returnBrokenResource(jedis);
 		} finally {
 			_jedisPool.returnResource(jedis);
 		}
@@ -341,6 +368,9 @@ public class AuthManager4Redis implements AppAuthUserDataManager {
 			authInfo.setExpiringTime(Long.parseLong(jedis.hget(authTicketRedisKey, COL_NAME_EXPIRING_TIME)));
 			
 			return authInfo;
+		} catch(JedisConnectionException e) {
+			_jedisPool.returnBrokenResource(jedis);
+			return null;
 		} finally {
 			_jedisPool.returnResource(jedis);
 		}
@@ -360,6 +390,8 @@ public class AuthManager4Redis implements AppAuthUserDataManager {
 			
 			int expiredSeconds = (int) ((authInfo.getExpiringTime() - System.currentTimeMillis()) / 1000); 
 			jedis.expire(authTicketRedisKey, expiredSeconds);
+		} catch(JedisConnectionException e) {
+			_jedisPool.returnBrokenResource(jedis);
 		} finally {
 			_jedisPool.returnResource(jedis);
 		}
