@@ -101,7 +101,6 @@ public class HttpClientUtil {
 		_defaultHeaders.add(new BasicNameValuePair("Accept-Encoding", "gzip"));
 		_defaultHeaders.add(new BasicNameValuePair("accept", "*/*"));
 		
-		_defaultHeadersForMultipartPost.add(new BasicNameValuePair("Content-Type", "application/x-www-form-urlencoded"));
 		_defaultHeadersForMultipartPost.add(new BasicNameValuePair("Accept-Encoding", "gzip"));
 		_defaultHeadersForMultipartPost.add(new BasicNameValuePair("accept", "*/*"));
 	};
