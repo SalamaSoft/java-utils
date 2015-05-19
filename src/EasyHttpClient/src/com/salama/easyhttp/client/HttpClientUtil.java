@@ -182,7 +182,7 @@ public class HttpClientUtil {
 			List<String> paramNames, List<String> paramValues) throws ClientProtocolException, IOException {
 		List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		doBasicGet(url, pairs, output);
+		doBasicGet(getHttpClient(), url, pairs, output);
 		return new String(output.toByteArray(), DEFAULT_CHARSET);
 	}
 	
@@ -191,7 +191,7 @@ public class HttpClientUtil {
 		List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
 
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		doBasicGet(url, pairs, output);
+		doBasicGet(getHttpClient(), url, pairs, output);
 		return new String(output.toByteArray(), DEFAULT_CHARSET);
 	}
 
@@ -199,7 +199,7 @@ public class HttpClientUtil {
 			String[] paramNames, String[] paramValues) throws ClientProtocolException, IOException {
 		List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		doBasicGet(url, pairs, output);
+		doBasicGet(getHttpClient(), url, pairs, output);
 		return output.toByteArray();
 	}
 	
@@ -207,20 +207,20 @@ public class HttpClientUtil {
 			List<String> paramNames, List<String> paramValues) throws ClientProtocolException, IOException {
 		List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		doBasicGet(url, pairs, output);
+		doBasicGet(getHttpClient(), url, pairs, output);
 		return output.toByteArray();
 	}
 
 	public static int doGetDownload(String url,
 			String[] paramNames, String[] paramValues, OutputStream output) throws ClientProtocolException, IOException {
 		List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
-		return doBasicGet(url, pairs, output);
+		return doBasicGet(getHttpClient(), url, pairs, output);
 	}
 	
 	public static int doGetDownload(String url,
 			List<String> paramNames, List<String> paramValues, OutputStream output) throws ClientProtocolException, IOException {
 		List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
-		return doBasicGet(url, pairs, output);
+		return doBasicGet(getHttpClient(), url, pairs, output);
 	}
 	
 	private static List<BasicNameValuePair> makeDoGetParamPairs(List<String> paramNames, List<String> paramValues) {
@@ -271,7 +271,9 @@ public class HttpClientUtil {
 		return urlWithParams.toString();
 	}
 	
-	private static int doBasicGet(String url, List<BasicNameValuePair> pairs,
+	public static int doBasicGet(
+			HttpClient httpClient,
+			String url, List<BasicNameValuePair> pairs,
 			OutputStream output) throws ClientProtocolException, IOException {
 		//Http client
 		String urlStrWithParams = makeDoGetUrlWithParams(url, pairs);
@@ -279,7 +281,7 @@ public class HttpClientUtil {
 		
 		try {
 			addDefaultHeaders(request);
-			HttpResponse response = getHttpClient().execute(request);
+			HttpResponse response = httpClient.execute(request);
 
 			if (response.getStatusLine().getStatusCode() == RESPONSE_STATUS_SUCCESS) {
 				return getResponseContent(response.getEntity(), output);
@@ -303,9 +305,9 @@ public class HttpClientUtil {
 			// 封装请求参数
 			List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
 
-			doBasicPost(url, pairs, output);
+			doBasicPost(getHttpClient(), url, pairs, output);
 		} else {
-			doBasicPostMultipart(url, paramNames, paramValues, filePartValues, output);
+			doBasicPostMultipart(getHttpClient(), url, paramNames, paramValues, filePartValues, output);
 		}
 
 		return new String(output.toByteArray(), DEFAULT_CHARSET);
@@ -320,9 +322,9 @@ public class HttpClientUtil {
 			// 封装请求参数
 			List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
 
-			doBasicPost(url, pairs, output);
+			doBasicPost(getHttpClient(), url, pairs, output);
 		} else {
-			doBasicPostMultipart(url, paramNames, paramValues, filePartValues, output);
+			doBasicPostMultipart(getHttpClient(), url, paramNames, paramValues, filePartValues, output);
 		}
 
 		return new String(output.toByteArray(), DEFAULT_CHARSET);
@@ -337,9 +339,9 @@ public class HttpClientUtil {
 			// 封装请求参数
 			List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
 
-			doBasicPost(url, pairs, output);
+			doBasicPost(getHttpClient(), url, pairs, output);
 		} else {
-			doBasicPostMultipart(url, paramNames, paramValues, filePartValues, output);
+			doBasicPostMultipart(getHttpClient(), url, paramNames, paramValues, filePartValues, output);
 		}
 
 		return output.toByteArray();
@@ -352,13 +354,13 @@ public class HttpClientUtil {
 			// 封装请求参数
 			List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
 
-			return doBasicPost(url, pairs, output);
+			return doBasicPost(getHttpClient(), url, pairs, output);
 		} else {
-			return doBasicPostMultipart(url, paramNames, paramValues, filePartValues, output);
+			return doBasicPostMultipart(getHttpClient(), url, paramNames, paramValues, filePartValues, output);
 		}
 	}
 
-	private static int doBasicPost(String url, List<BasicNameValuePair> pairs, OutputStream output)
+	public static int doBasicPost(HttpClient httpClient, String url, List<BasicNameValuePair> pairs, OutputStream output)
 			throws ClientProtocolException, IOException {
 		
 		HttpPost request = new HttpPost(url);
@@ -372,7 +374,7 @@ public class HttpClientUtil {
 				request.setEntity(formEntity);
 			}
 			
-			HttpResponse response = getHttpClient().execute(request);
+			HttpResponse response = httpClient.execute(request);
 			
 			if (response.getStatusLine().getStatusCode() == RESPONSE_STATUS_SUCCESS) {
 				return getResponseContent(response.getEntity(), output);
@@ -388,7 +390,9 @@ public class HttpClientUtil {
 		
 	}
 
-	private static int doBasicPostMultipart(String url,
+	public static int doBasicPostMultipart(
+			HttpClient httpClient,
+			String url,
 			List<String> paramNames, List<String> paramValues,
 			List<MultiPartFile> filePartValues, OutputStream output) throws ClientProtocolException, IOException {
 
@@ -422,10 +426,12 @@ public class HttpClientUtil {
 			}
 		}
 	
-		return doMultipartPost(url, multipartEntity, output);
+		return doMultipartPost(httpClient, url, multipartEntity, output);
 	}
 
-	private static int doBasicPostMultipart(String url,
+	public static int doBasicPostMultipart(
+			HttpClient httpClient,
+			String url,
 			String[] paramNames, String[] paramValues,
 			MultiPartFile[] filePartValues, OutputStream output) throws ClientProtocolException, IOException {
 
@@ -458,10 +464,12 @@ public class HttpClientUtil {
 			}
 		}
 	
-		return doMultipartPost(url, multipartEntity, output);
+		return doMultipartPost(httpClient, url, multipartEntity, output);
 	}
 	
-	private static int doMultipartPost(String url,
+	public static int doMultipartPost(
+			HttpClient httpClient,
+			String url,
 			MultipartEntity multipartEntity, OutputStream output) throws ClientProtocolException, IOException {
 		// 使用HttpPost对象设置发送的URL路径
 		HttpPost request = new HttpPost(url);
@@ -470,7 +478,7 @@ public class HttpClientUtil {
 			addPostMultipartHeaders(request);
 
 			request.setEntity(multipartEntity);
-			HttpResponse response = getHttpClient().execute(request);
+			HttpResponse response = httpClient.execute(request);
 
 			if (response.getStatusLine().getStatusCode() == RESPONSE_STATUS_SUCCESS) {
 				return getResponseContent(response.getEntity(), output);
