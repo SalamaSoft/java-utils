@@ -23,12 +23,7 @@ public class SSLHttpClientUtilTest {
 			
 			String url = "https://github.com/";
 			
-			ByteArrayOutputStream responseBytes = new ByteArrayOutputStream();
-			HttpClientUtil.doBasicGet(sslClientUtil.createHttpClient(), 
-					url, 
-					(List<BasicNameValuePair>)null, responseBytes);
-			
-			String response = new String(responseBytes.toByteArray(), "utf-8");
+			String response = sslClientUtil.doGet(url, (String[])null, (String[])null);
 			System.out.println("response:-----------------\n" + response);
 		} catch(Throwable e) {
 			e.printStackTrace();
@@ -53,12 +48,7 @@ public class SSLHttpClientUtilTest {
 			
 			String url = "https://testssl.com/";
 			
-			ByteArrayOutputStream responseBytes = new ByteArrayOutputStream();
-			HttpClientUtil.doBasicGet(sslClientUtil.createHttpClient(), 
-					url, 
-					(List<BasicNameValuePair>)null, responseBytes);
-			
-			String response = new String(responseBytes.toByteArray(), "utf-8");
+			String response = sslClientUtil.doGet(url, (String[])null, (String[])null);
 			System.out.println("response:-----------------\n" + response);
 		} catch(Throwable e) {
 			e.printStackTrace();

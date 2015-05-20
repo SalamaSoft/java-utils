@@ -1,7 +1,9 @@
 package com.salama.easyhttp.client;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -9,16 +11,22 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -99,7 +107,7 @@ public class SSLHttpClientUtil {
 		setTimeout(DEFAULT_CONNECTION_POOL_TIMEOUT_MS, DEFAULT_CONNECTION_TIMEOUT_MS, DEFAULT_REQUEST_TIMEOUT_MS);
 	}
 
-	public HttpClient createHttpClient() throws IOException {
+	public HttpClient getHttpClient() throws IOException {
 		HttpClient customerHttpClient = new DefaultHttpClient(_connectionManager,
 				_httpParams);
 
@@ -124,6 +132,116 @@ public class SSLHttpClientUtil {
 		ks.load(p12, storePassword.toCharArray());
 		
 		return ks;
+	}
+	
+	
+	public String doGet(String url,
+			List<String> paramNames, List<String> paramValues) throws ClientProtocolException, IOException {
+		List<BasicNameValuePair> pairs = HttpClientUtil.makeDoGetParamPairs(paramNames, paramValues);
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		HttpClientUtil.doBasicGet(getHttpClient(), url, pairs, output);
+		return new String(output.toByteArray(), DEFAULT_CHARSET);
+	}
+	
+	public String doGet(String url,
+			String[] paramNames, String[] paramValues) throws ClientProtocolException, IOException {
+		List<BasicNameValuePair> pairs = HttpClientUtil.makeDoGetParamPairs(paramNames, paramValues);
+
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		HttpClientUtil.doBasicGet(getHttpClient(), url, pairs, output);
+		return new String(output.toByteArray(), DEFAULT_CHARSET);
+	}
+
+	public byte[] doGetDownload(String url,
+			String[] paramNames, String[] paramValues) throws ClientProtocolException, IOException {
+		List<BasicNameValuePair> pairs = HttpClientUtil.makeDoGetParamPairs(paramNames, paramValues);
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		HttpClientUtil.doBasicGet(getHttpClient(), url, pairs, output);
+		return output.toByteArray();
+	}
+	
+	public byte[] doGetDownload(String url,
+			List<String> paramNames, List<String> paramValues) throws ClientProtocolException, IOException {
+		List<BasicNameValuePair> pairs = HttpClientUtil.makeDoGetParamPairs(paramNames, paramValues);
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		HttpClientUtil.doBasicGet(getHttpClient(), url, pairs, output);
+		return output.toByteArray();
+	}
+
+	public int doGetDownload(String url,
+			String[] paramNames, String[] paramValues, OutputStream output) throws ClientProtocolException, IOException {
+		List<BasicNameValuePair> pairs = HttpClientUtil.makeDoGetParamPairs(paramNames, paramValues);
+		return HttpClientUtil.doBasicGet(getHttpClient(), url, pairs, output);
+	}
+	
+	public int doGetDownload(String url,
+			List<String> paramNames, List<String> paramValues, OutputStream output) throws ClientProtocolException, IOException {
+		List<BasicNameValuePair> pairs = HttpClientUtil.makeDoGetParamPairs(paramNames, paramValues);
+		return HttpClientUtil.doBasicGet(getHttpClient(), url, pairs, output);
+	}
+
+	public String doPost(String url,
+			List<String> paramNames, List<String> paramValues,
+			List<MultiPartFile> filePartValues) throws ClientProtocolException, IOException {
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+		if (filePartValues == null || filePartValues.size() == 0) {
+			// 封装请求参数
+			List<BasicNameValuePair> pairs = HttpClientUtil.makeDoGetParamPairs(paramNames, paramValues);
+
+			HttpClientUtil.doBasicPost(getHttpClient(), url, pairs, output);
+		} else {
+			HttpClientUtil.doBasicPostMultipart(getHttpClient(), url, paramNames, paramValues, filePartValues, output);
+		}
+
+		return new String(output.toByteArray(), DEFAULT_CHARSET);
+	}
+
+	public String doPost(String url,
+			String[] paramNames, String[] paramValues,
+			MultiPartFile[] filePartValues) throws ClientProtocolException, IOException {
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+		if (filePartValues == null || filePartValues.length == 0) {
+			// 封装请求参数
+			List<BasicNameValuePair> pairs = HttpClientUtil.makeDoGetParamPairs(paramNames, paramValues);
+
+			HttpClientUtil.doBasicPost(getHttpClient(), url, pairs, output);
+		} else {
+			HttpClientUtil.doBasicPostMultipart(getHttpClient(), url, paramNames, paramValues, filePartValues, output);
+		}
+
+		return new String(output.toByteArray(), DEFAULT_CHARSET);
+	}
+	
+	public byte[] doPostDownload(String url,
+			List<String> paramNames, List<String> paramValues,
+			List<MultiPartFile> filePartValues) throws ClientProtocolException, IOException {
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+		if (filePartValues == null || filePartValues.size() == 0) {
+			// 封装请求参数
+			List<BasicNameValuePair> pairs = HttpClientUtil.makeDoGetParamPairs(paramNames, paramValues);
+
+			HttpClientUtil.doBasicPost(getHttpClient(), url, pairs, output);
+		} else {
+			HttpClientUtil.doBasicPostMultipart(getHttpClient(), url, paramNames, paramValues, filePartValues, output);
+		}
+
+		return output.toByteArray();
+	}
+
+	public int doPostDownload(String url,
+			List<String> paramNames, List<String> paramValues,
+			List<MultiPartFile> filePartValues, OutputStream output) throws ClientProtocolException, IOException {
+		if (filePartValues == null || filePartValues.size() == 0) {
+			// 封装请求参数
+			List<BasicNameValuePair> pairs = HttpClientUtil.makeDoGetParamPairs(paramNames, paramValues);
+
+			return HttpClientUtil.doBasicPost(getHttpClient(), url, pairs, output);
+		} else {
+			return HttpClientUtil.doBasicPostMultipart(getHttpClient(), url, paramNames, paramValues, filePartValues, output);
+		}
 	}
 	
 }

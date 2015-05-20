@@ -167,7 +167,7 @@ public class HttpClientUtil {
 		}
 	}
 
-	private static void addPostMultipartHeaders(HttpRequestBase request) {
+	public static void addPostMultipartHeaders(HttpRequestBase request) {
 //		request.addHeader("Accept-Encoding", "gzip");
 //		request.addHeader("accept", "*/*");
 
@@ -223,7 +223,7 @@ public class HttpClientUtil {
 		return doBasicGet(getHttpClient(), url, pairs, output);
 	}
 	
-	private static List<BasicNameValuePair> makeDoGetParamPairs(List<String> paramNames, List<String> paramValues) {
+	public static List<BasicNameValuePair> makeDoGetParamPairs(List<String> paramNames, List<String> paramValues) {
 		List<BasicNameValuePair> pairs = null;
 		if(paramNames != null && paramValues != null) {
 			pairs = new ArrayList<BasicNameValuePair>();
@@ -236,7 +236,7 @@ public class HttpClientUtil {
 		return pairs;
 	}
 	
-	private static List<BasicNameValuePair> makeDoGetParamPairs(String[] paramNames, String[] paramValues) {
+	public static List<BasicNameValuePair> makeDoGetParamPairs(String[] paramNames, String[] paramValues) {
 		List<BasicNameValuePair> pairs = null;
 		
 		if(paramNames != null && paramValues != null) {
