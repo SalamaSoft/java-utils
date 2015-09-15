@@ -397,7 +397,7 @@ public class HttpClientUtil {
 			List<MultiPartFile> filePartValues, OutputStream output) throws ClientProtocolException, IOException {
 
 		MultipartEntity multipartEntity = new MultipartEntity(
-				HttpMultipartMode.BROWSER_COMPATIBLE, null, DefaultCharset);
+				HttpMultipartMode.BROWSER_COMPATIBLE);
 
 		// 封装请求参数
 		if(paramNames != null && paramValues != null) {
@@ -436,7 +436,7 @@ public class HttpClientUtil {
 			MultiPartFile[] filePartValues, OutputStream output) throws ClientProtocolException, IOException {
 
 		MultipartEntity multipartEntity = new MultipartEntity(
-				HttpMultipartMode.BROWSER_COMPATIBLE, null, DefaultCharset);
+				HttpMultipartMode.BROWSER_COMPATIBLE);
 
 		// 封装请求参数
 		if(paramNames != null && paramValues != null) {
