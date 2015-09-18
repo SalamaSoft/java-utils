@@ -55,6 +55,11 @@ public class SSLHttpClientUtil {
 	private final PoolingClientConnectionManager _connectionManager;
 	private final HttpParams _httpParams;
 
+	
+	public PoolingClientConnectionManager getConnectionManager() {
+		return _connectionManager;
+	}
+
 	public SSLHttpClientUtil(KeyStore keystore, String storePassword) throws NoSuchAlgorithmException, CertificateException, KeyStoreException, IOException, KeyManagementException, UnrecoverableKeyException {
 		this(keystore, storePassword, null, null);
 	}
