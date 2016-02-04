@@ -101,6 +101,7 @@ public class HttpClientUtil {
 		_defaultHeaders.add(new BasicNameValuePair("Accept-Encoding", "gzip"));
 		_defaultHeaders.add(new BasicNameValuePair("accept", "*/*"));
 		
+		
 		_defaultHeadersForMultipartPost.add(new BasicNameValuePair("Accept-Encoding", "gzip"));
 		_defaultHeadersForMultipartPost.add(new BasicNameValuePair("accept", "*/*"));
 	};
@@ -180,47 +181,88 @@ public class HttpClientUtil {
 	
 	public static String doGet(String url,
 			List<String> paramNames, List<String> paramValues) throws ClientProtocolException, IOException {
+		return doGet(getHttpClient(), url, paramNames, paramValues);
+	}
+	
+	public static String doGet(
+			HttpClient httpClient,
+			String url,
+			List<String> paramNames, List<String> paramValues) throws ClientProtocolException, IOException {
 		List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		doBasicGet(getHttpClient(), url, pairs, output);
+		doBasicGet(httpClient, url, pairs, output);
 		return new String(output.toByteArray(), DEFAULT_CHARSET);
 	}
 	
 	public static String doGet(String url,
 			String[] paramNames, String[] paramValues) throws ClientProtocolException, IOException {
-		List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
-
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		doBasicGet(getHttpClient(), url, pairs, output);
-		return new String(output.toByteArray(), DEFAULT_CHARSET);
+		return doGet(getHttpClient(), url, paramNames, paramValues);
 	}
 
-	public static byte[] doGetDownload(String url,
+	public static String doGet(
+			HttpClient httpClient,
+			String url,
 			String[] paramNames, String[] paramValues) throws ClientProtocolException, IOException {
 		List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		doBasicGet(getHttpClient(), url, pairs, output);
+		doBasicGet(httpClient, url, pairs, output);
+		return new String(output.toByteArray(), DEFAULT_CHARSET);
+	}
+	
+	public static byte[] doGetDownload(String url,
+			String[] paramNames, String[] paramValues) throws ClientProtocolException, IOException {
+		return doGetDownload(getHttpClient(), url, paramNames, paramValues);
+	}
+	
+	public static byte[] doGetDownload(
+			HttpClient httpClient,
+			String url,
+			String[] paramNames, String[] paramValues) throws ClientProtocolException, IOException {
+		List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		doBasicGet(httpClient, url, pairs, output);
 		return output.toByteArray();
 	}
 	
 	public static byte[] doGetDownload(String url,
 			List<String> paramNames, List<String> paramValues) throws ClientProtocolException, IOException {
-		List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		doBasicGet(getHttpClient(), url, pairs, output);
-		return output.toByteArray();
+		return doGetDownload(getHttpClient(), url, paramNames, paramValues);
 	}
 
-	public static int doGetDownload(String url,
+	public static int doGetDownload(
+			HttpClient httpClient,
+			String url,
 			String[] paramNames, String[] paramValues, OutputStream output) throws ClientProtocolException, IOException {
 		List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
-		return doBasicGet(getHttpClient(), url, pairs, output);
+		return doBasicGet(httpClient, url, pairs, output);
+	}
+	
+	public static int doGetDownload(String url,
+			String[] paramNames, String[] paramValues, OutputStream output) throws ClientProtocolException, IOException {
+		return doGetDownload(getHttpClient(), url, paramNames, paramValues, output);
+	}
+	
+	public static byte[] doGetDownload(
+			HttpClient httpClient,
+			String url,
+			List<String> paramNames, List<String> paramValues) throws ClientProtocolException, IOException {
+		List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		doBasicGet(httpClient, url, pairs, output);
+		return output.toByteArray();
 	}
 	
 	public static int doGetDownload(String url,
 			List<String> paramNames, List<String> paramValues, OutputStream output) throws ClientProtocolException, IOException {
+		return doGetDownload(getHttpClient(), url, paramNames, paramValues, output);
+	}
+	
+	public static int doGetDownload(
+			HttpClient httpClient,
+			String url,
+			List<String> paramNames, List<String> paramValues, OutputStream output) throws ClientProtocolException, IOException {
 		List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
-		return doBasicGet(getHttpClient(), url, pairs, output);
+		return doBasicGet(httpClient, url, pairs, output);
 	}
 	
 	public static List<BasicNameValuePair> makeDoGetParamPairs(List<String> paramNames, List<String> paramValues) {
@@ -299,38 +341,12 @@ public class HttpClientUtil {
 	public static String doPost(String url,
 			List<String> paramNames, List<String> paramValues,
 			List<MultiPartFile> filePartValues) throws ClientProtocolException, IOException {
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
-
-		if (filePartValues == null || filePartValues.size() == 0) {
-			// 封装请求参数
-			List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
-
-			doBasicPost(getHttpClient(), url, pairs, output);
-		} else {
-			doBasicPostMultipart(getHttpClient(), url, paramNames, paramValues, filePartValues, output);
-		}
-
-		return new String(output.toByteArray(), DEFAULT_CHARSET);
+		return doPost(getHttpClient(), url, paramNames, paramValues, filePartValues);
 	}
 
-	public static String doPost(String url,
-			String[] paramNames, String[] paramValues,
-			MultiPartFile[] filePartValues) throws ClientProtocolException, IOException {
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
-
-		if (filePartValues == null || filePartValues.length == 0) {
-			// 封装请求参数
-			List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
-
-			doBasicPost(getHttpClient(), url, pairs, output);
-		} else {
-			doBasicPostMultipart(getHttpClient(), url, paramNames, paramValues, filePartValues, output);
-		}
-
-		return new String(output.toByteArray(), DEFAULT_CHARSET);
-	}
-	
-	public static byte[] doPostDownload(String url,
+	public static String doPost(
+			HttpClient httpClient,
+			String url,
 			List<String> paramNames, List<String> paramValues,
 			List<MultiPartFile> filePartValues) throws ClientProtocolException, IOException {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -339,9 +355,59 @@ public class HttpClientUtil {
 			// 封装请求参数
 			List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
 
-			doBasicPost(getHttpClient(), url, pairs, output);
+			doBasicPost(httpClient, url, pairs, output);
 		} else {
-			doBasicPostMultipart(getHttpClient(), url, paramNames, paramValues, filePartValues, output);
+			doBasicPostMultipart(httpClient, url, paramNames, paramValues, filePartValues, output);
+		}
+
+		return new String(output.toByteArray(), DEFAULT_CHARSET);
+	}
+
+	public static String doPost(String url,
+			String[] paramNames, String[] paramValues,
+			MultiPartFile[] filePartValues) throws ClientProtocolException, IOException {
+		return doPost(getHttpClient(), url, paramNames, paramValues, filePartValues);
+	}
+	
+	public static String doPost(
+			HttpClient httpClient,
+			String url,
+			String[] paramNames, String[] paramValues,
+			MultiPartFile[] filePartValues) throws ClientProtocolException, IOException {
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+		if (filePartValues == null || filePartValues.length == 0) {
+			// 封装请求参数
+			List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
+
+			doBasicPost(httpClient, url, pairs, output);
+		} else {
+			doBasicPostMultipart(httpClient, url, paramNames, paramValues, filePartValues, output);
+		}
+
+		return new String(output.toByteArray(), DEFAULT_CHARSET);
+	}
+	
+	public static byte[] doPostDownload(String url,
+			List<String> paramNames, List<String> paramValues,
+			List<MultiPartFile> filePartValues) throws ClientProtocolException, IOException {
+		return doPostDownload(getHttpClient(), url, paramNames, paramValues, filePartValues);
+	}
+	
+	public static byte[] doPostDownload(
+			HttpClient httpClient,
+			String url,
+			List<String> paramNames, List<String> paramValues,
+			List<MultiPartFile> filePartValues) throws ClientProtocolException, IOException {
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+		if (filePartValues == null || filePartValues.size() == 0) {
+			// 封装请求参数
+			List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
+
+			doBasicPost(httpClient, url, pairs, output);
+		} else {
+			doBasicPostMultipart(httpClient, url, paramNames, paramValues, filePartValues, output);
 		}
 
 		return output.toByteArray();
@@ -350,13 +416,21 @@ public class HttpClientUtil {
 	public static int doPostDownload(String url,
 			List<String> paramNames, List<String> paramValues,
 			List<MultiPartFile> filePartValues, OutputStream output) throws ClientProtocolException, IOException {
+		return doPostDownload(getHttpClient(), url, paramNames, paramValues, filePartValues, output);
+	}
+	
+	public static int doPostDownload(
+			HttpClient httpClient,
+			String url,
+			List<String> paramNames, List<String> paramValues,
+			List<MultiPartFile> filePartValues, OutputStream output) throws ClientProtocolException, IOException {
 		if (filePartValues == null || filePartValues.size() == 0) {
 			// 封装请求参数
 			List<BasicNameValuePair> pairs = makeDoGetParamPairs(paramNames, paramValues);
 
-			return doBasicPost(getHttpClient(), url, pairs, output);
+			return doBasicPost(httpClient, url, pairs, output);
 		} else {
-			return doBasicPostMultipart(getHttpClient(), url, paramNames, paramValues, filePartValues, output);
+			return doBasicPostMultipart(httpClient, url, paramNames, paramValues, filePartValues, output);
 		}
 	}
 

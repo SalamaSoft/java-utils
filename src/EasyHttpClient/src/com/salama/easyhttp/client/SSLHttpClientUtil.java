@@ -13,6 +13,13 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
@@ -23,6 +30,7 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
@@ -49,6 +57,26 @@ public class SSLHttpClientUtil {
 		public boolean isTrusted(X509Certificate[] arg0, String arg1)
 				throws CertificateException {
 			return true;
+		}
+	};
+	public final static X509HostnameVerifier HostnameVerifierTrustAnyHost = new X509HostnameVerifier() {
+		
+		@Override
+		public boolean verify(String arg0, SSLSession arg1) {
+			return true;
+		}
+		
+		@Override
+		public void verify(String arg0, String[] arg1, String[] arg2)
+				throws SSLException {
+		}
+		
+		@Override
+		public void verify(String arg0, X509Certificate arg1) throws SSLException {
+		}
+		
+		@Override
+		public void verify(String arg0, SSLSocket arg1) throws IOException {
 		}
 	};
 
@@ -83,12 +111,49 @@ public class SSLHttpClientUtil {
 		SchemeRegistry schReg = new SchemeRegistry();
 		schReg.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
 		
-		SSLSocketFactory socketFactory = new SSLSocketFactory(
-				SSLSocketFactory.TLS, 
-				keystore, storePassword, trustStore, 
-				null,
-				trustStrategy,
-				SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+		SSLSocketFactory socketFactory;
+		
+		/* deprecated way
+		if(keystore == null && trustStore == null) {
+			SSLContext sslCtx = SSLContext.getInstance("SSLv3");
+			X509TrustManager trustManager = new X509TrustManager() {
+				
+				@Override
+				public X509Certificate[] getAcceptedIssuers() {
+					return null;
+				}
+				
+				@Override
+				public void checkServerTrusted(X509Certificate[] chain, String authType)
+						throws CertificateException {
+				}
+				
+				@Override
+				public void checkClientTrusted(X509Certificate[] chain, String authType)
+						throws CertificateException {
+				}
+			};
+			
+			sslCtx.init(
+					null,
+					new TrustManager[] {trustManager},
+					null);
+			
+			socketFactory = new SSLSocketFactory(sslCtx);
+			socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+		} else {
+			*/
+			socketFactory = new SSLSocketFactory(
+					//SSLSocketFactory.TLS,
+					"TLS",
+					keystore, storePassword, trustStore, 
+					null,
+					trustStrategy,
+					//SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
+					HostnameVerifierTrustAnyHost
+					);
+		//}
+		
 		
 		schReg.register(new Scheme("https", 443, socketFactory));
 		

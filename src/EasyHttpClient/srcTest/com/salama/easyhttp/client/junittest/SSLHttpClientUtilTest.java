@@ -1,12 +1,9 @@
 package com.salama.easyhttp.client.junittest;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.security.KeyStore;
-import java.util.List;
 
-import org.apache.http.message.BasicNameValuePair;
 import org.junit.Test;
 
 import com.salama.easyhttp.client.HttpClientUtil;
@@ -21,6 +18,7 @@ public class SSLHttpClientUtilTest {
 					null, null, null, 
 					SSLHttpClientUtil.TrustStrategyTrustAnyServer);
 			
+			sslClientUtil.setTimeout(5000, 5000, 10000);
 			String url = "https://github.com/";
 			
 			String response = sslClientUtil.doGet(url, (String[])null, (String[])null);
@@ -54,5 +52,5 @@ public class SSLHttpClientUtilTest {
 			e.printStackTrace();
 		}
 	}
-	
+
 }
