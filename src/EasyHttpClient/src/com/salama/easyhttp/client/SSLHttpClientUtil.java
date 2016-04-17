@@ -204,6 +204,13 @@ public class SSLHttpClientUtil {
 		return ks;
 	}
 	
+	public final static KeyStore readJKS(InputStream p12, String storePassword) throws NoSuchAlgorithmException, CertificateException, IOException, KeyStoreException {
+		KeyStore ks = KeyStore.getInstance("JKS");
+
+		ks.load(p12, storePassword.toCharArray());
+		
+		return ks;
+	}
 	
 	public String doGet(String url,
 			List<String> paramNames, List<String> paramValues) throws ClientProtocolException, IOException {

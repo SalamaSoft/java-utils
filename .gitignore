@@ -4,6 +4,7 @@
 RemoteSystemsTempFiles/
 .DS_Store/
 bin/
+temp/
 
 *.command
 

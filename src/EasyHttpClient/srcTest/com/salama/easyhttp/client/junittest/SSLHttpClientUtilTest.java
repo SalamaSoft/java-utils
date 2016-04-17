@@ -21,6 +21,7 @@ public class SSLHttpClientUtilTest {
 			sslClientUtil.setTimeout(5000, 5000, 10000);
 			String url = "https://github.com/";
 			
+			
 			String response = sslClientUtil.doGet(url, (String[])null, (String[])null);
 			System.out.println("response:-----------------\n" + response);
 		} catch(Throwable e) {
