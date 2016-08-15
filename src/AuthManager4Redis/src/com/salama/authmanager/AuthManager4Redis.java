@@ -17,7 +17,6 @@ import com.salama.service.clouddata.core.AppException;
 import com.salama.service.clouddata.core.AuthUserInfo;
 
 public class AuthManager4Redis implements AppAuthUserDataManager {
-
 	private final static String COL_NAME_USER_ID = "userId";
 	private final static String COL_NAME_ROLE = "role";
 	private final static String COL_NAME_EXPIRING_TIME = "expiringTime";
@@ -52,6 +51,47 @@ public class AuthManager4Redis implements AppAuthUserDataManager {
 	private int _jedisPoolMaxIdle = 20;
 	private int _jedisPoolMaxWait = 100;
 	private int _jedisPoolSoftMinEvictableIdleTimeMillis = 10000;
+
+	public AuthManager4Redis(
+			String serverCd,
+			String maxMapCacheCount, 
+			String redisHost, 
+			String redisPort,
+			String jedisPoolMaxActive, 
+			String jedisPoolMaxIdle, 
+			String jedisPoolMaxWait,
+			String jedisPoolSoftMinEvictableIdleTimeMillis
+			) {
+		this(
+				serverCd, maxMapCacheCount, 
+				redisHost, redisPort, 
+				jedisPoolMaxActive, jedisPoolMaxIdle, jedisPoolMaxWait, 
+				jedisPoolSoftMinEvictableIdleTimeMillis, 
+				null,
+				null
+				);
+	}
+
+	public AuthManager4Redis(
+			String serverCd,
+			String maxMapCacheCount, 
+			String redisHost, 
+			String redisPort,
+			String jedisPoolMaxActive, 
+			String jedisPoolMaxIdle, 
+			String jedisPoolMaxWait,
+			String jedisPoolSoftMinEvictableIdleTimeMillis,
+			String password
+			) {
+		this(
+				serverCd, maxMapCacheCount, 
+				redisHost, redisPort, 
+				jedisPoolMaxActive, jedisPoolMaxIdle, jedisPoolMaxWait, 
+				jedisPoolSoftMinEvictableIdleTimeMillis, 
+				password,
+				null
+				);
+	}
 	
 	public AuthManager4Redis(
 			String serverCd,
@@ -61,7 +101,10 @@ public class AuthManager4Redis implements AppAuthUserDataManager {
 			String jedisPoolMaxActive, 
 			String jedisPoolMaxIdle, 
 			String jedisPoolMaxWait,
-			String jedisPoolSoftMinEvictableIdleTimeMillis) {
+			String jedisPoolSoftMinEvictableIdleTimeMillis,
+			String password,
+			String dbNum
+			) {
 //		try {
 //			_md5 = MessageDigest.getInstance("MD5");
 //		} catch (NoSuchAlgorithmException e) {
@@ -89,8 +132,20 @@ public class AuthManager4Redis implements AppAuthUserDataManager {
 		
 		jedisConfig.setSoftMinEvictableIdleTimeMillis(_jedisPoolSoftMinEvictableIdleTimeMillis);
 		jedisConfig.setTestOnBorrow(false);
-		
-		_jedisPool = new JedisPool(jedisConfig, _redisHost, _redisPort);
+
+		int iDbNum = 0;
+		if(dbNum != null && dbNum.length() > 0) {
+			iDbNum = Integer.parseInt(dbNum);
+		}
+		if(password != null && password.length() == 0) {
+			password = null;
+		}
+		_jedisPool = new JedisPool(
+				jedisConfig, _redisHost, _redisPort,
+				_jedisPoolMaxWait,
+				password,
+				iDbNum
+				);
 	}
 	
 	private String getAuthRedisKey(String authTicket) {
