@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<List>
+  <Test2Data>
+    <bar>AAoUHigyPEZQWg==</bar>
+    <bv>3</bv>
+    <car>
+      <char>0</char>
+      <char>10</char>
+      <char>20</char>
+      <char>30</char>
+      <char>40</char>
+    </car>
+    <cv>103</cv>
+    <fv>136623.44</fv>
+    <id>333444</id>
+    <nm>aaaaaaaテスト测试</nm>
+  </Test2Data>
+  <Test2Data>
+    <bar>AAoUHigyPEZQWg==</bar>
+    <bv>3</bv>
+    <car>
+      <char>0</char>
+      <char>10</char>
+      <char>20</char>
+      <char>30</char>
+      <char>40</char>
+    </car>
+    <cv>103</cv>
+    <fv>136623.44</fv>
+    <id>333444</id>
+    <nm>aaaaaaaテスト测试</nm>
+  </Test2Data>
+</List>

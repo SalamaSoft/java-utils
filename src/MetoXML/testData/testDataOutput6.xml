@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Array>
+  <Test2Data>
+    <Id>333444</Id>
+    <Nm>aaaaaaaテスト测试</Nm>
+    <Bv>3</Bv>
+    <Fv>136623.4375</Fv>
+    <Bar>AAoUHigyPEZQWg==</Bar>
+    <Cv>103</Cv>
+    <Car>
+      <char>0</char>
+      <char>10</char>
+      <char>20</char>
+      <char>30</char>
+      <char>40</char>
+    </Car>
+  </Test2Data>
+  <Test2Data>
+    <Id>333444</Id>
+    <Nm>aaaaaaaテスト测试</Nm>
+    <Bv>3</Bv>
+    <Fv>136623.4375</Fv>
+    <Bar>AAoUHigyPEZQWg==</Bar>
+    <Cv>103</Cv>
+    <Car>
+      <char>0</char>
+      <char>10</char>
+      <char>20</char>
+      <char>30</char>
+      <char>40</char>
+    </Car>
+  </Test2Data>
+</Array>
