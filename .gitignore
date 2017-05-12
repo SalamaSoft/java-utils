@@ -5,8 +5,8 @@ RemoteSystemsTempFiles/
 .DS_Store/
 bin/
 temp/
-
 *.command
+.recommenders/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SearchPageResult>
+  <dataList>
+    <Test2Data>
+      <bv>0</bv>
+      <cv>0</cv>
+      <fv>0.0</fv>
+      <id>0</id>
+      <nm></nm>
+    </Test2Data>
+    <Test2Data>
+      <bv>0</bv>
+      <cv>0</cv>
+      <fv>0.0</fv>
+      <id>0</id>
+      <nm></nm>
+    </Test2Data>
+    <Test2Data>
+      <bv>0</bv>
+      <cv>0</cv>
+      <fv>0.0</fv>
+      <id>0</id>
+      <nm></nm>
+    </Test2Data>
+  </dataList>
+  <pageControl>
+    <currentPageIndex>0</currentPageIndex>
+    <pageSize>20</pageSize>
+    <totalPageCount>0</totalPageCount>
+    <totalRecordCount>0</totalRecordCount>
+  </pageControl>
+</SearchPageResult>

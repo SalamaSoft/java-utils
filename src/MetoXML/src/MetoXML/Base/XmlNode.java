@@ -8,7 +8,7 @@ import CollectionCommon.ITreeNode;
 public class XmlNode implements ITreeNode{
     private String name = "";
 
-    private List<XmlNodeAttribute> attributes = new ArrayList<XmlNodeAttribute>();
+    private List<XmlNodeAttribute> attributes = new ArrayList<XmlNodeAttribute>(0);
 
     private XmlNode parentNode = null;
 

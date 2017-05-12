@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TestData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Id>3569660</Id>
+  <id>3569660</id>
   <Nm>ffffffffテスト测试</Nm>
   <Bv>9</Bv>
   <Fv>136623.438</Fv>
   <Bar>CRMdJzE7RU9ZYw==</Bar>
   <Cv>103</Cv>
-  <Car>
+  <car>
     <char>9</char>
     <char>19</char>
     <char>29</char>
     <char>39</char>
     <char>49</char>
-  </Car>
+  </car>
   <Iar>
     <int>1000</int>
     <int>2000</int>

@@ -14,6 +14,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.tools.codec.Base64FormatException;
 
@@ -21,6 +22,7 @@ import CollectionCommon.ITreeNode;
 import CollectionCommon.TreeDeepPriorVisitor;
 import MetoXML.Base.XmlDocument;
 import MetoXML.Base.XmlNode;
+import MetoXML.Base.XmlNodeAttribute;
 import MetoXML.Base.XmlParseException;
 import MetoXML.Cast.BaseTypesMapping;
 import MetoXML.Util.ClassFinder;
@@ -28,7 +30,7 @@ import MetoXML.Util.DataClassFinder;
 
 public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
 	static {
-		System.out.println("XmlDeserializer lastModified:20170227");
+		System.out.println("XmlDeserializer v2.0. lastModified:20170512");
 	}
 	
 	public static final Charset DefaultCharset = Charset.forName("UTF-8");
@@ -190,6 +192,9 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
             {
                 rootNodeInfo.obj = rootNodeInfo.objType.newInstance();
             }
+            else if (IsMap(rootNodeInfo.objType)) {
+            	rootNodeInfo.obj = new HashMap<String, Object>();
+            }
 
             //debugLog("ConvertXmlNodeToObject() before VisitAllNode()");
             
@@ -212,11 +217,9 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
         {
             //it is not root node
             NodeInfoData nodeInfo = _nodeInfoStack.get(_nodeInfoStack.size() - 1);
-            Class<?> currentObjType = null;
-
             if (IsArray(nodeInfo.objType))
             { 
-            	currentObjType = nodeInfo.objType.getComponentType();
+            	Class<?> currentObjType = nodeInfo.objType.getComponentType();
 
                 try {
 	                if (isLeafNode)
@@ -244,7 +247,7 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
             else if (IsList((Class<?>)nodeInfo.objType))
             { 
                 try {
-					currentObjType = GetTypeByString(((XmlNode)node).getName());
+                	Class<?> currentObjType = GetTypeByName(((XmlNode)node).getName());
 
 					if (isLeafNode)
 					{
@@ -252,6 +255,11 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
 					}
 					else
 					{
+						if(currentObjType == null) {
+							//to support map entry
+							currentObjType = HashMap.class;
+						}
+						
 					    PushNodeInfoStack(currentObjType);
 					}
 				} catch (ClassNotFoundException e) {
@@ -269,6 +277,19 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				} 
+            } else if (IsMap((Class<?>)nodeInfo.objType)) {
+            	//parent is map
+            	if(isLeafNode) {
+            		((Map)nodeInfo.obj).put(((XmlNode)node).getName(), ((XmlNode)node).getContent());
+            	} else {
+            		try {
+						PushNodeInfoStack(GetTypeForManEntry((XmlNode)node));
+					} catch (IllegalAccessException e) {
+						throw new RuntimeException(e);
+					} catch (InstantiationException e) {
+						throw new RuntimeException(e);
+					}
+            	}
             }
             else 
             { 
@@ -277,7 +298,7 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
 					//PropertyDescriptor pInf = new PropertyDescriptor(((XmlNode)node).getName(), nodeInfo.objType);
 					PropertyDescriptor pInf = findPropertyDescriptor(((XmlNode)node).getName(), nodeInfo.objType);
 					
-					currentObjType = pInf.getPropertyType();
+					Class<?> currentObjType = pInf.getPropertyType();
 
 					if (isLeafNode)
 					{
@@ -332,10 +353,12 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
                 if (nodeInfo.valueList.size() > 0)
                 {
                 	if(nodeInfo.objType.isInterface()) {
-                    	nodeInfo.obj = new ArrayList();
+                    	//nodeInfo.obj = new ArrayList();
+                		nodeInfo.obj = nodeInfo.valueList;
                 	} else {
                 		try {
 							nodeInfo.obj = nodeInfo.objType.newInstance();
+							((List)nodeInfo.obj).addAll(nodeInfo.valueList);
 						} catch (InstantiationException e) {
 							throw new RuntimeException(e);
 						} catch (IllegalAccessException e) {
@@ -343,10 +366,13 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
 						} 
                 	}
 
+                	/*
                     for (int i = 0; i < nodeInfo.valueList.size(); i++)
                     {
                         ((List)nodeInfo.obj).add(nodeInfo.valueList.get(i));
                     }
+                    */
+                	
                 }
             }
             else
@@ -361,6 +387,9 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
             else if (IsList(parentNodeInfo.objType))
             {
                 parentNodeInfo.valueList.add(nodeInfo.obj);
+            }
+            else if (IsMap(parentNodeInfo.objType)) {
+            	((Map)parentNodeInfo.obj).put(((XmlNode)node).getName(), nodeInfo.obj);
             }
             else
             {
@@ -473,10 +502,15 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
 
     }
     
-    private Class<?> GetTypeByString(String typeStr) throws ClassNotFoundException
-    { 
-    	Class<?> cls = (Class<?>) BaseTypesMapping.GetSupportedTypeByDisplayName(typeStr);
+    private Class<?> GetTypeByName(String typeStr) throws ClassNotFoundException
+    {
+    	if(typeStr.equals(XmlSerializer.TAG_NAME_LIST)) {
+    		return ArrayList.class;
+    	} else if(typeStr.equals(XmlSerializer.TAG_NAME_MAP)) {
+    		return Map.class;
+    	}
     	
+    	Class<?> cls = (Class<?>) BaseTypesMapping.GetSupportedTypeByDisplayName(typeStr);
     	if(cls != null) { 
     		return cls;
     	} else {
@@ -484,7 +518,42 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
     	}
     	
     }
-   
+
+    private Class<?> GetTypeForManEntry(XmlNode node) {
+	    List<XmlNodeAttribute> attrs = node.getAttributes();
+	    
+	    if(attrs == null) {
+	    	return HashMap.class;
+	    } else {
+	    	int attrSize = attrs.size();
+	    	if(attrSize == 0) {
+	    		return HashMap.class;
+	    	} else if (attrSize == 1) {
+	    		XmlNodeAttribute attr = attrs.get(0);
+	    		if(XmlSerializer.ATTR_NAME_TYPE.equals(attr.getName())) {
+	    			return ArrayList.class;
+	    		} else {
+		    		return HashMap.class;
+	    		}
+	    	} else {
+	    		boolean isList = false;
+	    		for (XmlNodeAttribute attr : attrs) {
+		    		if(XmlSerializer.ATTR_NAME_TYPE.equals(attr.getName())) {
+		    			isList = true;
+		    			break;
+		    		}
+	    		}
+	    		
+	    	    if(isList) {
+	    	    	return ArrayList.class;
+	    	    } else {
+	    	    	return HashMap.class;
+	    	    }
+	    	}
+	    }
+    	
+    }
+    
 
     private void PushNodeInfoStack(Class<?> type) throws IllegalAccessException, InstantiationException
     {
@@ -500,6 +569,8 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
             //List
             nodeInf = new NodeInfoData(null, type);
             nodeInf.valueList = new ArrayList<Object>();
+        } else if (IsMap(type)) {
+            nodeInf = new NodeInfoData(new HashMap<String, Object>(), type);
         }
         else
         {
@@ -567,6 +638,8 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
     		return BaseTypesMapping.DecodeBase64(valueStr);
     	} else if(IsList(cls)) {
     		return cls.newInstance();
+    	} else if (IsMap(cls)) {
+    		return cls.newInstance();
     	} else {
     		if(isElementOfList) {
     			return cls.newInstance();
@@ -583,6 +656,10 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
     private static boolean IsList(Class<?> cls) {
     	//return IsInterfaceType(cls, List.class);
     	return List.class.isAssignableFrom(cls);
+    }
+    
+    private static boolean IsMap(Class<?> cls) {
+    	return Map.class.isAssignableFrom(cls);
     }
     
     private static boolean debugLog(String msg) {

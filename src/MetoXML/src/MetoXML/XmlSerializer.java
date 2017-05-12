@@ -10,12 +10,17 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import CollectionCommon.ITreeNode;
 import MetoXML.Base.XmlDocument;
 import MetoXML.Base.XmlNode;
+import MetoXML.Base.XmlNodeAttribute;
 import MetoXML.Cast.BaseTypesMapping;
 
 public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
@@ -25,8 +30,11 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
 	public static final String TAG_NAME_ARRAY = "List";
 	
 	public static final String TAG_NAME_LIST = "List";
+	public static final String TAG_NAME_MAP = "Map";
 	
 	public static final String TAG_NAME_BYTE_ARRAY = "byte[]";
+	
+	public static final String ATTR_NAME_TYPE = "type";
 
 	public void Serialize(String filePath, Object obj, Class<?> typeOfObj, Charset charset) 
     throws IOException, IntrospectionException, IllegalAccessException, InvocationTargetException {
@@ -195,6 +203,10 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
             //List
             classNode = new NodeInfoData(obj, 0, rootNode, NodeType.ElementInList);
             classNodeStack.add(classNode);
+        } else if (IsMap(typeOfObj)) {
+        	//Map
+            classNode = new NodeInfoData(obj, 0, rootNode, ((Map<String, Object>)obj).entrySet().toArray(new Map.Entry[0]));
+            classNodeStack.add(classNode);
         }
         else
         {
@@ -220,6 +232,8 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
             else if (classNode.type == NodeType.ElementInArray)
             {
                 arrayLen = Array.getLength(classNode.obj);
+            } else if (classNode.type == NodeType.EntryInMap) {
+            	arrayLen = classNode.mapEntryArray.length;
             }
             else
             {
@@ -271,13 +285,19 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
                     tagName = "";
                     classNode.index++;
                 }
-                else
-                {
+                else if (classNode.type == NodeType.ElementInList) {
                     objTmp = ((List)classNode.obj).get(classNode.index);
-
                     tagName = "";
 
                     classNode.index++;
+                } else if (classNode.type == NodeType.EntryInMap) {
+                	Map.Entry<String, Object> entry = classNode.mapEntryArray[classNode.index];
+                	objTmp = entry.getValue();
+                	tagName = entry.getKey();
+                	
+                	classNode.index ++;
+                } else {
+                	throw new RuntimeException("Not supported type:" + classNode.obj.getClass().getName());
                 }
 
             }
@@ -335,6 +355,11 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
                         nodeTmp.setName(TAG_NAME_ARRAY);
                     }
 
+                    if(classNode.type == NodeType.EntryInMap) {
+                    	//to support parse map
+                    	addAttrTypeListForMapEntry(nodeTmp);
+                    }
+                    
                     AddNextNode(classNode.node, prevNode, nodeTmp);
 
                     classNode = new NodeInfoData(objTmp, 0, nodeTmp, NodeType.ElementInArray);
@@ -355,10 +380,33 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
                 {
                     nodeTmp.setName(TAG_NAME_LIST);
                 }
+                
+                if(classNode.type == NodeType.EntryInMap) {
+                	//to support parse map
+                	addAttrTypeListForMapEntry(nodeTmp);
+                }
 
                 AddNextNode(classNode.node, prevNode, nodeTmp);
 
                 classNode = new NodeInfoData(objTmp, 0, nodeTmp, NodeType.ElementInList);
+                classNodeStack.add(classNode);
+
+                prevNode = null;
+            } else if (IsMap(objTmp.getClass())) {
+                nodeTmp = new XmlNode();
+                if (tagName.length() > 0)
+                {
+                    nodeTmp.setName(tagName);
+                }
+                else
+                {
+                    nodeTmp.setName(TAG_NAME_MAP);
+                }
+
+                AddNextNode(classNode.node, prevNode, nodeTmp);
+
+                //classNode = new NodeInfoData(objTmp, 0, nodeTmp, Introspector.getBeanInfo(objTmp.getClass()).getPropertyDescriptors());
+                classNode = new NodeInfoData(objTmp, 0, nodeTmp, ((Map<String, Object>)objTmp).entrySet().toArray(new Map.Entry[0]));
                 classNodeStack.add(classNode);
 
                 prevNode = null;
@@ -390,7 +438,7 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
         return rootNode;
     }
 
-    private void AddNextNode(XmlNode parentNode, XmlNode prevNode, XmlNode nodeForAdd)
+    private static void AddNextNode(XmlNode parentNode, XmlNode prevNode, XmlNode nodeForAdd)
     {
         nodeForAdd.setParentNode(parentNode);
 
@@ -406,6 +454,10 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
             nodeForAdd.setPreviousNode(prevNode);
             prevNode.setNextNode(nodeForAdd);
         }
+    }
+    
+    private static void addAttrTypeListForMapEntry(XmlNode nodeTmp) {
+    	nodeTmp.getAttributes().add(new XmlNodeAttribute(ATTR_NAME_TYPE, TAG_NAME_LIST));
     }
 
     /// <summary>
@@ -424,6 +476,8 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
         else if (IsList(type))
         {
             return TAG_NAME_LIST;
+        } else if (IsMap(type)) {
+        	return TAG_NAME_MAP;
         }
         else
         {
@@ -460,6 +514,10 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
     	return List.class.isAssignableFrom(cls);
     }
     
+    private static boolean IsMap(Class<?> cls) {
+    	return Map.class.isAssignableFrom(cls);
+    }
+    
     /*
     private static boolean IsInterfaceType(Class<?> cls, Class<?> interfaceClass) {
     	if(cls.isInterface() && cls.getName().equals(interfaceClass.getName())) {
@@ -485,6 +543,7 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
     	return name;
     }
 
+    
     /// <summary>
     /// Modified on 2010/10/23
     /// </summary>
@@ -492,7 +551,7 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
     /// <param name="value"></param>
     /// <returns></returns>
     
-    public enum NodeType {Property, ElementInArray, ElementInList};
+    public enum NodeType {Property, ElementInArray, ElementInList, EntryInMap};
 
     protected class NodeInfoData
     {
@@ -504,6 +563,8 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
         public Object obj = null;
 
         public PropertyDescriptor[] propInfArray = null;
+        
+        public Map.Entry<String, Object>[] mapEntryArray = null;
 
         /// <summary>
         /// The xml node of the object
@@ -537,6 +598,16 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
             this.index = indexInProperties;
             this.node = nodeOfObj;
         }
+        
+        public NodeInfoData(Object objForMap, int indexInProperties, XmlNode nodeOfObj, Map.Entry<String, Object>[] mapEntryArray)
+        {
+            this.type = NodeType.EntryInMap;
+            this.obj = objForMap;
+            this.mapEntryArray = mapEntryArray;
+            this.index = indexInProperties;
+            this.node = nodeOfObj;
+        }
+        
     }
 
 	@Override

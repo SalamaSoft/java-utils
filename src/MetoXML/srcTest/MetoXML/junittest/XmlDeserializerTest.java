@@ -57,7 +57,7 @@ public class XmlDeserializerTest {
 		testDeserialize(inputFile, outputFile, TestData.class);
 	}
 
-	// @Test
+	@Test
 	public void test4() {
 		File inputFile = makeTestFile("testDataoutput4.xml");
 		File outputFile = makeTestFile("testDataoutput4J.xml");
@@ -65,7 +65,7 @@ public class XmlDeserializerTest {
 		testDeserialize(inputFile, outputFile, String.class);
 	}
 
-	// @Test
+	@Test
 	public void test5() {
 		File inputFile = makeTestFile("testDataoutput5.xml");
 		File outputFile = makeTestFile("testDataoutput5J.xml");
@@ -73,7 +73,7 @@ public class XmlDeserializerTest {
 		testDeserialize(inputFile, outputFile, String[].class);
 	}
 
-	// @Test
+	@Test
 	public void test6() {
 		File inputFile = makeTestFile("testDataoutput6.xml");
 		File outputFile = makeTestFile("testDataoutput6J.xml");
@@ -81,7 +81,7 @@ public class XmlDeserializerTest {
 		testDeserialize(inputFile, outputFile, Test2Data[].class);
 	}
 
-	// @Test
+	@Test
 	public void test7() {
 		File inputFile = makeTestFile("testDataoutput7.xml");
 		File outputFile = makeTestFile("testDataoutput7J.xml");
@@ -92,7 +92,7 @@ public class XmlDeserializerTest {
 		testDeserialize(inputFile, outputFile, (new ArrayList<String>()).getClass());
 	}
 
-	// @Test
+	@Test
 	public void test8() {
 		File inputFile = makeTestFile("testDataoutput8.xml");
 		File outputFile = makeTestFile("testDataoutput8J.xml");
@@ -109,7 +109,7 @@ public class XmlDeserializerTest {
 		serialize(outputFile, data2, Test3Data.class);
 	}
 
-	// @Test
+	@Test
 	public void test9() {
 		try {
 			/*
@@ -138,7 +138,7 @@ public class XmlDeserializerTest {
 		}
 	}
 
-	// @Test
+	@Test
 	public void test10() {
 		File inputFile = makeTestFile("testDataoutput10.xml");
 
@@ -153,7 +153,7 @@ public class XmlDeserializerTest {
 		serialize(outputFile, s2, String.class);
 	}
 
-	// @Test
+	@Test
 	public void Test11() {
 		try {
 			String xmlStr = "<String>a</String>";
@@ -168,12 +168,12 @@ public class XmlDeserializerTest {
 		}
 	}
 
-	// @Test
+	@Test
 	public void test12() {
 
 		File inputFile = makeTestFile("testDataoutput12.xml");
 
-		File outputFile = makeTestFile("testDataoutputJ12.xml");
+		File outputFile = makeTestFile("testDataoutput12J.xml");
 
 		SearchPageResult<Test2Data> searchResult = new SearchPageResult<Test2Data>();
 		Test2Data data2 = null;
