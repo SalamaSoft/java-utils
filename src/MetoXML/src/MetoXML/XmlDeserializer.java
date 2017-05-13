@@ -30,7 +30,7 @@ import MetoXML.Util.DataClassFinder;
 
 public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
 	static {
-		System.out.println("XmlDeserializer v2.0. lastModified:20170512");
+		System.out.println("XmlDeserializer v2.0.1. lastModified:20170513");
 	}
 	
 	public static final Charset DefaultCharset = Charset.forName("UTF-8");
@@ -505,7 +505,7 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
     private Class<?> GetTypeByName(String typeStr) throws ClassNotFoundException
     {
     	if(typeStr.equals(XmlSerializer.TAG_NAME_LIST)) {
-    		return ArrayList.class;
+    		return List.class;
     	} else if(typeStr.equals(XmlSerializer.TAG_NAME_MAP)) {
     		return Map.class;
     	}
@@ -521,37 +521,36 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
 
     private Class<?> GetTypeForManEntry(XmlNode node) {
 	    List<XmlNodeAttribute> attrs = node.getAttributes();
+    	int attrSize = attrs.size();
 	    
-	    if(attrs == null) {
-	    	return HashMap.class;
-	    } else {
-	    	int attrSize = attrs.size();
-	    	if(attrSize == 0) {
-	    		return HashMap.class;
-	    	} else if (attrSize == 1) {
-	    		XmlNodeAttribute attr = attrs.get(0);
-	    		if(XmlSerializer.ATTR_NAME_TYPE.equals(attr.getName())) {
+	    if(attrs != null) {
+	    	if(attrSize == 1) {
+	    		if(XmlSerializer.ATTR_NAME_TYPE.equals(attrs.get(0).getName())) {
 	    			return ArrayList.class;
-	    		} else {
-		    		return HashMap.class;
 	    		}
-	    	} else {
-	    		boolean isList = false;
+	    	} else if(attrSize > 1) {
 	    		for (XmlNodeAttribute attr : attrs) {
 		    		if(XmlSerializer.ATTR_NAME_TYPE.equals(attr.getName())) {
-		    			isList = true;
-		    			break;
+		    			return ArrayList.class;
 		    		}
 	    		}
-	    		
-	    	    if(isList) {
-	    	    	return ArrayList.class;
-	    	    } else {
-	    	    	return HashMap.class;
-	    	    }
 	    	}
 	    }
-    	
+	    
+	    //find out if children's names are same
+	    XmlNode child0 = node.getFirstChildNode();
+	    if(child0 != null) {
+	    	XmlNode child1 = child0.getNextNode();
+	    	if(child1 != null) {
+	    		if(child0.getName().equals(child1.getName())) {
+	    			//children's names are same
+	    			return ArrayList.class;
+	    		}
+	    	}
+	    }
+	    
+	    //default
+	    return HashMap.class;
     }
     
 
