@@ -87,6 +87,14 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
         xmlWriter.WriteXmlDocument(xmlDoc, sw);
     }
 
+	public static String objectToString(Object obj)
+	throws IntrospectionException, IllegalAccessException, InvocationTargetException, IOException {
+		if(obj == null) {
+			return "";
+		} else {
+			return objectToString(obj, obj.getClass(), false, false);
+		}
+	}	
 	
 	public static String objectToString(Object obj, Class<?> typeOfObj)
 	throws IntrospectionException, IllegalAccessException, InvocationTargetException, IOException {
