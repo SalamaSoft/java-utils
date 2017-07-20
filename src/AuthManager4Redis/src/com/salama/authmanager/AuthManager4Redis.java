@@ -1,5 +1,7 @@
 package com.salama.authmanager;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
@@ -16,7 +18,7 @@ import com.salama.service.clouddata.core.AppAuthUserDataManager;
 import com.salama.service.clouddata.core.AppException;
 import com.salama.service.clouddata.core.AuthUserInfo;
 
-public class AuthManager4Redis implements AppAuthUserDataManager {
+public class AuthManager4Redis implements AppAuthUserDataManager, Closeable {
 	private final static String COL_NAME_USER_ID = "userId";
 	private final static String COL_NAME_ROLE = "role";
 	private final static String COL_NAME_EXPIRING_TIME = "expiringTime";
@@ -146,6 +148,11 @@ public class AuthManager4Redis implements AppAuthUserDataManager {
 				password,
 				iDbNum
 				);
+	}
+	
+	@Override
+	public void close() throws IOException {
+		_jedisPool.destroy();
 	}
 	
 	private String getAuthRedisKey(String authTicket) {
