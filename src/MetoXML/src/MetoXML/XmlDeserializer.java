@@ -16,17 +16,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.w3c.tools.codec.Base64FormatException;
-
-import CollectionCommon.ITreeNode;
-import CollectionCommon.TreeDeepPriorVisitor;
 import MetoXML.Base.XmlDocument;
 import MetoXML.Base.XmlNode;
 import MetoXML.Base.XmlNodeAttribute;
 import MetoXML.Base.XmlParseException;
 import MetoXML.Cast.BaseTypesMapping;
+import MetoXML.Util.Base64FormatException;
 import MetoXML.Util.ClassFinder;
 import MetoXML.Util.DataClassFinder;
+import MetoXML.Util.ITreeNode;
 
 public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
 	static {

@@ -3,10 +3,9 @@ package MetoXML;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import CollectionCommon.TreeDeepPriorVisitor;
+import MetoXML.Util.TreeDeepPriorVisitor;
 
 public abstract class AbstractReflectInfoCachedSerializer extends TreeDeepPriorVisitor {
 	private static ConcurrentHashMap<String, PropertyDescriptor[]> _propertyDescriptorArrayCache = 

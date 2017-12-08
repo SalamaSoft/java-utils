@@ -3,7 +3,7 @@ package MetoXML.Base;
 import java.util.ArrayList;
 import java.util.List;
 
-import CollectionCommon.ITreeNode;
+import MetoXML.Util.ITreeNode;
 
 public class XmlNode implements ITreeNode{
     private String name = "";

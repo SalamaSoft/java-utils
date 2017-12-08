@@ -17,11 +17,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import CollectionCommon.ITreeNode;
 import MetoXML.Base.XmlDocument;
 import MetoXML.Base.XmlNode;
 import MetoXML.Base.XmlNodeAttribute;
 import MetoXML.Cast.BaseTypesMapping;
+import MetoXML.Util.ITreeNode;
 
 public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
 	public static final Charset DefaultCharset = Charset.forName("UTF-8");

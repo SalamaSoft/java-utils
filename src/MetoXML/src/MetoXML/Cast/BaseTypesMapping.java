@@ -13,9 +13,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.w3c.tools.codec.Base64Decoder;
-import org.w3c.tools.codec.Base64Encoder;
-import org.w3c.tools.codec.Base64FormatException;
+import MetoXML.Util.Base64Decoder;
+import MetoXML.Util.Base64Encoder;
+import MetoXML.Util.Base64FormatException;
 
 public class BaseTypesMapping {
     //public final static String DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.SSS00ZZ:ZZ";
