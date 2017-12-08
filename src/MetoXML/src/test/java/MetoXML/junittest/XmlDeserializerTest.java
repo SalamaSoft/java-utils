@@ -1,47 +1,26 @@
 package MetoXML.junittest;
 
-import static org.junit.Assert.*;
-
-import java.beans.DesignMode;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
-
-import org.junit.Ignore;
-import org.junit.Test;
-
-import MetoXML.XmlDeserializer;
-import MetoXML.XmlSerializer;
-import MetoXML.Base.XmlDocument;
 import MetoXML.Base.XmlParseException;
 import MetoXML.Cast.BaseTypesMapping;
 import MetoXML.Util.DataClassFinder;
+import MetoXML.XmlDeserializer;
+import MetoXML.XmlSerializer;
 import MetoXML.junittest.data.Test2Data;
 import MetoXML.junittest.data.Test3Data;
 import MetoXML.junittest.data.TestData;
-import MetoXML.junittest.generic.PageControl;
 import MetoXML.junittest.generic.SearchPageResult;
 import MetoXML.junittest.test4.DaTiAnswerData;
+import org.junit.Test;
+
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.Assert.fail;
 
 public class XmlDeserializerTest {
 

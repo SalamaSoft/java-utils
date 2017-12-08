@@ -28,7 +28,7 @@ import MetoXML.Util.ITreeNode;
 
 public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
 	static {
-		System.out.println("XmlDeserializer v2.0.1. lastModified:20170513");
+		System.out.println("XmlDeserializer v2.0.2. lastModified:20171208");
 	}
 	
 	public static final Charset DefaultCharset = Charset.forName("UTF-8");

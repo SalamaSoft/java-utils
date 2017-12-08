@@ -163,7 +163,7 @@
     </Test2Data>
   </TDataAr>
   <ListS>
-    <string>3</string>
-    <string>13</string>
+    <String>3</String>
+    <String>13</String>
   </ListS>
 </TestData>

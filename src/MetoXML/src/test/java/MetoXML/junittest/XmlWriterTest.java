@@ -62,7 +62,7 @@ public class XmlWriterTest {
 			XmlDocument xmlDoc = reader.ReadXml(new File("testData", "testData.xml").getAbsolutePath());
 			
 			XmlWriter writer = new XmlWriter();
-			writer.WriteXmlDocument(xmlDoc, new File("testData", "testDataOutput.xml").getAbsolutePath());
+			writer.WriteXmlDocument(xmlDoc, new File("testData", "testDataJ.xml").getAbsolutePath());
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
