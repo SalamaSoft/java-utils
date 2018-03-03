@@ -46,9 +46,9 @@ public class HttpClientUtil {
 	public static final String DEFAULT_CHARSET = "utf-8";
 	public static final Charset DefaultCharset = Charset.forName(DEFAULT_CHARSET);
 	
-	public static final int DEFAULT_CONNECTION_POOL_TIMEOUT_MS = 10000;
-	public static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10000;
-	public static final int DEFAULT_REQUEST_TIMEOUT_MS = 30000;
+	public static final int DEFAULT_CONNECTION_POOL_TIMEOUT_MS = 500;
+	public static final int DEFAULT_CONNECTION_TIMEOUT_MS = 5000;
+	public static final int DEFAULT_REQUEST_TIMEOUT_MS = 60000;
 	
 	public static final int RESPONSE_STATUS_SUCCESS = 200;
 	
@@ -90,8 +90,14 @@ public class HttpClientUtil {
 		schReg.register(new Scheme("https", 443, SSLSocketFactory.getSocketFactory()));
 		
 		connectionManager = new PoolingClientConnectionManager(schReg);
-		
-		//Default headers ------------------------------------------
+
+		//default pool size
+        final int maxPerRoute = 16384;
+        connectionManager.setDefaultMaxPerRoute(maxPerRoute);
+        connectionManager.setMaxTotal(maxPerRoute * 2);
+
+
+        //Default headers ------------------------------------------
 		_defaultHeaders.add(new BasicNameValuePair("Content-Type", "application/x-www-form-urlencoded"));
 		_defaultHeaders.add(new BasicNameValuePair("Accept-Encoding", "gzip"));
 		_defaultHeaders.add(new BasicNameValuePair("accept", "*/*"));
