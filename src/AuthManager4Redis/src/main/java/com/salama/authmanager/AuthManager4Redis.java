@@ -42,13 +42,13 @@ public class AuthManager4Redis implements AppAuthUserDataManager, Closeable {
 	
 	private String _appId = null;
 	private String _serverCd = null;
-	
+
 	private int _maxMapCacheCount = 1000000;
 	private String _redisHost = null;
 	private int _redisPort = 0;
-	
+
 	private JedisPool _jedisPool = null;
-	
+
 	private int _jedisPoolMaxActive = 100;
 	private int _jedisPoolMaxIdle = 20;
 	private int _jedisPoolMaxWait = 100;
@@ -65,7 +65,7 @@ public class AuthManager4Redis implements AppAuthUserDataManager, Closeable {
 			String jedisPoolSoftMinEvictableIdleTimeMillis
 			) {
 		this(
-				serverCd, maxMapCacheCount, 
+				serverCd, maxMapCacheCount,
 				redisHost, redisPort, 
 				jedisPoolMaxActive, jedisPoolMaxIdle, jedisPoolMaxWait, 
 				jedisPoolSoftMinEvictableIdleTimeMillis, 
@@ -86,7 +86,7 @@ public class AuthManager4Redis implements AppAuthUserDataManager, Closeable {
 			String password
 			) {
 		this(
-				serverCd, maxMapCacheCount, 
+				serverCd, maxMapCacheCount,
 				redisHost, redisPort, 
 				jedisPoolMaxActive, jedisPoolMaxIdle, jedisPoolMaxWait, 
 				jedisPoolSoftMinEvictableIdleTimeMillis, 

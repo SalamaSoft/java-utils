@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="AuthManager4Redis" default="generateJar" basedir=".">
+<project name="EasyHttpClient" default="generateJar" basedir=".">
 	<!-- Configure directories -->
 	<!-- 
-	<property name="jdk.dir"         value="C:\Java\jdk1.6.0_19"/>
+	<property name="jdk.dir"         value="C:\jdk1.6.0_20"/>
 	-->
 	<property name="src.dir"         value="src"/>
 	<property name="bin.dir"         value="bin"/>
 	<property name="bintemp.dir"     value="binTemp"/>
-	<property name="jar.name"        value="AuthManager4Redis.jar"/>
+	<property name="jar.name"        value="EasyHttpClient.jar"/>
 	
 	<!--
 	<target name="cleandir" description="clean the bin dir"> 
@@ -26,7 +26,7 @@
 			</fileset>
 		</copy>
 	</target>
-	
+
 	<target name="createBinTmp">
 		<mkdir dir="${bintemp.dir}"/>
 	</target>
