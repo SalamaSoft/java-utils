@@ -1,37 +1,14 @@
 package com.salama.easyhttp.client;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.List;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
-import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
@@ -39,6 +16,18 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
+
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.List;
 
 /**
  * 
@@ -53,7 +42,6 @@ public class SSLHttpClientUtil {
 	
 	public final static TrustStrategy TrustStrategyTrustAnyServer = new TrustStrategy() {
 		
-		@Override
 		public boolean isTrusted(X509Certificate[] arg0, String arg1)
 				throws CertificateException {
 			return true;
@@ -61,21 +49,17 @@ public class SSLHttpClientUtil {
 	};
 	public final static X509HostnameVerifier HostnameVerifierTrustAnyHost = new X509HostnameVerifier() {
 		
-		@Override
 		public boolean verify(String arg0, SSLSession arg1) {
 			return true;
 		}
 		
-		@Override
 		public void verify(String arg0, String[] arg1, String[] arg2)
 				throws SSLException {
 		}
 		
-		@Override
 		public void verify(String arg0, X509Certificate arg1) throws SSLException {
 		}
 		
-		@Override
 		public void verify(String arg0, SSLSocket arg1) throws IOException {
 		}
 	};

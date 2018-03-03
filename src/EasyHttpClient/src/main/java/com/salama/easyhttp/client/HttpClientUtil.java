@@ -1,17 +1,5 @@
 package com.salama.easyhttp.client;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.GZIPInputStream;
-
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -41,6 +29,13 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.util.EntityUtils;
+
+import java.io.*;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 /**
  * 
@@ -106,15 +101,6 @@ public class HttpClientUtil {
 		_defaultHeadersForMultipartPost.add(new BasicNameValuePair("accept", "*/*"));
 	};
 
-	/**
-	 * 
-	 * @param timeout
-	 *            从连接池中取连接的超时时间
-	 * @param connTimeout
-	 *            连接超时
-	 * @param requestTimeout
-	 *            请求超时
-	 */
 	private HttpClientUtil() {
 
 	}
