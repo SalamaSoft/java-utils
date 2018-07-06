@@ -1,5 +1,15 @@
 package MetoXML;
 
+import MetoXML.Base.XmlDocument;
+import MetoXML.Base.XmlNode;
+import MetoXML.Base.XmlNodeAttribute;
+import MetoXML.Base.XmlParseException;
+import MetoXML.Cast.BaseTypesMapping;
+import MetoXML.Util.Base64FormatException;
+import MetoXML.Util.ClassFinder;
+import MetoXML.Util.DataClassFinder;
+import MetoXML.Util.ITreeNode;
+
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.io.FileInputStream;
@@ -15,16 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import MetoXML.Base.XmlDocument;
-import MetoXML.Base.XmlNode;
-import MetoXML.Base.XmlNodeAttribute;
-import MetoXML.Base.XmlParseException;
-import MetoXML.Cast.BaseTypesMapping;
-import MetoXML.Util.Base64FormatException;
-import MetoXML.Util.ClassFinder;
-import MetoXML.Util.DataClassFinder;
-import MetoXML.Util.ITreeNode;
 
 public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
 	static {
@@ -596,10 +596,13 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
             	} else {
     				property.getWriteMethod().invoke(obj, cls.newInstance());
             	}
-			} else if (BaseTypesMapping.IsSupportedBaseType(cls)) {
+            /* Modified on 2018/07/06 -> duplicated code
+			} else if(BaseTypesMapping.IsSupportedBaseType(cls)) {
 				BaseTypesMapping.SetPropertyValueOfPrimitiveType(obj, property, valueStr);
+			*/
 			} else {
-				//Do nothing
+				//Do nothing. Modified on 2018/07/06 ->  throw error
+                throw new RuntimeException("Unsupported type: " + cls.getName() + " property:" + property.getName());
 			}
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);

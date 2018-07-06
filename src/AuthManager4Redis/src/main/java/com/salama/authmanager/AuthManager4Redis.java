@@ -38,7 +38,7 @@ public class AuthManager4Redis implements AppAuthUserDataManager, Closeable {
 	
 	private int _authTicketSeq = 0;
 	private Object _lockForAuthTicket = new Object();
-	private Random _randomForAuthTicket = new Random(System.currentTimeMillis());
+    private Random _randomForAuthTicket = new Random(System.currentTimeMillis());
 	
 	private String _appId = null;
 	private String _serverCd = null;
@@ -287,6 +287,7 @@ public class AuthManager4Redis implements AppAuthUserDataManager, Closeable {
 	@Override
 	public void updateAuthInfo(String authTicket, String role, long expiringTime)
 			throws AppException {
+	    /*
 		AuthUserInfo authInfo = _authTicketMap.get(authTicket);
 		
 		if(authInfo == null) {
@@ -303,6 +304,12 @@ public class AuthManager4Redis implements AppAuthUserDataManager, Closeable {
 			
 			updateAuthUserInfoToRedis(authTicket, role, expiringTime);
 		}
+		*/
+        AuthUserInfo authInfo = updateAuthUserInfoToRedis(authTicket, role, expiringTime);
+        if(authInfo == null) {
+            return;
+        }
+        saveAuthUserInfoToCacheMap(authTicket, authInfo);
 	}
 		
 	private void saveAuthUserInfoToCacheMap(String authTicket, AuthUserInfo authInfo) {
