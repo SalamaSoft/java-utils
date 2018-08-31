@@ -1,9 +1,6 @@
 package com.salama.easyhttp.client;
 
-import org.apache.http.HeaderElement;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
+import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -15,6 +12,7 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.FormBodyPart;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -28,6 +26,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import java.io.*;
@@ -35,6 +34,7 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -556,6 +556,52 @@ public class HttpClientUtil {
 				request.releaseConnection();
 			} catch(Exception e) {
 			}
+		}
+	}
+
+    public static String doPostStringEntity(
+            String url,
+            String charset,
+            String contentType,
+            Map<String, String> headers,
+            String content
+    ) throws IOException {
+        return doPostStringEntity(url, charset, contentType, headers, content);
+    }
+
+	public static String doPostStringEntity(
+	        HttpClient httpClient,
+            String url,
+            String charset,
+            String contentType,
+            Map<String, String> headers,
+            String content
+    ) throws IOException {
+		HttpPost httpost = new HttpPost(url);
+
+		try {
+			httpost.setHeader(HTTP.CONTENT_TYPE, contentType);
+
+			if(headers != null) {
+                for(Map.Entry<String, String> entry : headers.entrySet()) {
+                    httpost.addHeader(entry.getKey(), entry.getValue());
+                }
+            }
+
+			httpost.setEntity(new StringEntity(content, charset));
+
+			HttpResponse response = httpClient.execute(httpost);
+			if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+				return null;
+			}
+
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			int len = HttpClientUtil.getResponseContent(response.getEntity(), bos);
+			String responseStr = new String(bos.toByteArray(), charset);
+
+			return responseStr;
+		} finally {
+			httpost.releaseConnection();
 		}
 	}
 
