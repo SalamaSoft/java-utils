@@ -566,7 +566,7 @@ public class HttpClientUtil {
             Map<String, String> headers,
             String content
     ) throws IOException {
-        return doPostStringEntity(url, charset, contentType, headers, content);
+        return doPostStringEntity(HttpClientUtil.getHttpClient(), url, charset, contentType, headers, content);
     }
 
 	public static String doPostStringEntity(
