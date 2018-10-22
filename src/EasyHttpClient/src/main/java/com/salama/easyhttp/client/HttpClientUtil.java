@@ -591,8 +591,8 @@ public class HttpClientUtil {
 			httpost.setEntity(new StringEntity(content, charset));
 
 			HttpResponse response = httpClient.execute(httpost);
-			if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-				return null;
+			if(response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+				return "";
 			}
 
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
