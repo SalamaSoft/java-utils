@@ -7,9 +7,9 @@ import MetoXML.XmlDeserializer;
 import MetoXML.XmlSerializer;
 import MetoXML.junittest.data.Test2Data;
 import MetoXML.junittest.data.Test3Data;
+import MetoXML.junittest.data.Test5Data;
 import MetoXML.junittest.data.TestData;
 import MetoXML.junittest.generic.SearchPageResult;
-import MetoXML.junittest.test4.DaTiAnswerData;
 import org.junit.Test;
 
 import java.io.*;
@@ -168,77 +168,16 @@ public class XmlDeserializerTest {
 		System.out.println("result.getDataList().size():" + result.getDataList().size());
 	}
 
-	public static void main(String[] args) {
-		BaseTypesMapping.IsSupportedBaseType(byte.class);
-		testData4MultiThreads();
-		// for(int i = 0; i < 100; i++) {
-		// testData4();
-		// }
-	}
-
-	public static void testData4MultiThreads() {
-		// final XmlDeserializer xmlDes = new XmlDeserializer();
-		final DataClassFinder dataClassFinder = new DataClassFinder(DaTiAnswerData.class.getPackage());
-		for (int k = 0; k < 10; k++) {
-			for (int i = 0; i < 10; i++) {
-				Thread t = new Thread(new Runnable() {
-					public void run() {
-						// XmlDeserializerTest.testData4();
-
-						File inputFile = makeTestFile("testDataOutput4.xml");
-
-						long beginTime = System.currentTimeMillis();
-
-						try {
-							XmlDeserializer xmlDes = new XmlDeserializer();
-							DaTiAnswerData data = (DaTiAnswerData) xmlDes.Deserialize(inputFile.getAbsolutePath(),
-									DaTiAnswerData.class, XmlDeserializer.DefaultCharset, dataClassFinder);
-							System.out.println("testData4MultiThreads() time usage:"
-									+ Long.toString(System.currentTimeMillis() - beginTime));
-						} catch (XmlParseException e) {
-							e.printStackTrace();
-						} catch (IOException e) {
-							e.printStackTrace();
-						} catch (InvocationTargetException e) {
-							e.printStackTrace();
-						} catch (IllegalAccessException e) {
-							e.printStackTrace();
-						} catch (InstantiationException e) {
-							e.printStackTrace();
-						} catch (NoSuchMethodException e) {
-							e.printStackTrace();
-						}
-					}
-				});
-				t.start();
-			}
-		}
-
-		System.out.println("testData4MultiThreads() end");
-	}
-
-	public static void testData4() {
-		File inputFile = makeTestFile("testData4.xml");
-		long beginTime = System.currentTimeMillis();
-
-		XmlDeserializer xmlDes = new XmlDeserializer();
-		DataClassFinder dataClassFinder = new DataClassFinder(DaTiAnswerData.class.getPackage());
+	@Test
+	public void test13() {
+		Test5Data data = new Test5Data();
+		data.setStrArr(new String[0]);
 
 		try {
-			DaTiAnswerData data = (DaTiAnswerData) xmlDes.Deserialize(inputFile.getAbsolutePath(), DaTiAnswerData.class,
-					XmlDeserializer.DefaultCharset, dataClassFinder);
-			System.out.println("testData4() time usage:" + Long.toString(System.currentTimeMillis() - beginTime));
-		} catch (XmlParseException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
+			String xml = XmlSerializer.objectToString(data);
+			System.out.println("xml:" + xml);
+			Test5Data data2 = (Test5Data) XmlDeserializer.stringToObject(xml, Test5Data.class);
+		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 	}

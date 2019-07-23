@@ -33,6 +33,7 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
@@ -304,10 +305,22 @@ public class HttpClientUtil {
 		
 		return urlWithParams.toString();
 	}
-	
+
 	public static int doBasicGet(
 			HttpClient httpClient,
-			String url, List<BasicNameValuePair> pairs,
+			String url,
+			List<BasicNameValuePair> pairs,
+			OutputStream output) throws ClientProtocolException, IOException {
+		return doBasicGet(httpClient,
+				url, null,
+				pairs,
+				output);
+	}
+
+	public static int doBasicGet(
+			HttpClient httpClient,
+			String url, Map<String, String> headers,
+			List<BasicNameValuePair> pairs,
 			OutputStream output) throws ClientProtocolException, IOException {
 		//Http client
 		String urlStrWithParams = makeDoGetUrlWithParams(url, pairs);
@@ -315,6 +328,12 @@ public class HttpClientUtil {
 		
 		try {
 			addDefaultHeaders(request);
+			if(headers != null) {
+				for(Map.Entry<String, String> kv : headers.entrySet()) {
+					request.addHeader(kv.getKey(), kv.getValue());
+				}
+			}
+
 			HttpResponse response = httpClient.execute(request);
 
 			if (response.getStatusLine().getStatusCode() == RESPONSE_STATUS_SUCCESS) {
@@ -426,13 +445,29 @@ public class HttpClientUtil {
 		}
 	}
 
-	public static int doBasicPost(HttpClient httpClient, String url, List<BasicNameValuePair> pairs, OutputStream output)
-			throws ClientProtocolException, IOException {
+	public static int doBasicPost(
+			HttpClient httpClient,
+			String url,
+			List<BasicNameValuePair> pairs, OutputStream output
+	) throws ClientProtocolException, IOException {
+		return doBasicPost(httpClient, url, null, pairs, output);
+	}
+
+	public static int doBasicPost(
+			HttpClient httpClient,
+			String url, Map<String, String> headers,
+			List<BasicNameValuePair> pairs, OutputStream output
+	) throws ClientProtocolException, IOException {
 		
 		HttpPost request = new HttpPost(url);
 
 		try {
 			addDefaultHeaders(request);
+			if(headers != null) {
+				for(Map.Entry<String, String> kv : headers.entrySet()) {
+					request.addHeader(kv.getKey(), kv.getValue());
+				}
+			}
 
 			if(pairs != null && pairs.size() > 0) {
 				// 把请求参数变成请求体部分
@@ -461,38 +496,12 @@ public class HttpClientUtil {
 			String url,
 			List<String> paramNames, List<String> paramValues,
 			List<MultiPartFile> filePartValues, OutputStream output) throws ClientProtocolException, IOException {
-
-		MultipartEntity multipartEntity = new MultipartEntity(
-				HttpMultipartMode.BROWSER_COMPATIBLE);
-
-		// 封装请求参数
-		if(paramNames != null && paramValues != null) {
-			for (int i = 0; i < paramNames.size(); i++) {
-				multipartEntity.addPart(paramNames.get(i), 
-						new StringBody(paramValues.get(i), DefaultCharset));
-			}
-		}
-		
-		// 上传文件
-		if(filePartValues != null) {
-			MultiPartFile multiPartFile = null;
-			
-			for (int i = 0; i < filePartValues.size(); i++) {
-				multiPartFile = filePartValues.get(i); 
-				
-				if(multiPartFile.isUseInputStream()) {
-					multipartEntity.addPart(multiPartFile.getName(), 
-							new InputStreamBody(
-									multiPartFile.getInputStream(), 
-									multiPartFile.getName()));
-				} else {
-					multipartEntity.addPart(multiPartFile.getName(), 
-							new FileBody(multiPartFile.getFile()));
-				}
-			}
-		}
-	
-		return doMultipartPost(httpClient, url, multipartEntity, output);
+		return doBasicPostMultipart(
+				httpClient,
+				url, null,
+				makeDoGetParamPairs(paramNames, paramValues),
+				filePartValues, output
+		);
 	}
 
 	public static int doBasicPostMultipart(
@@ -500,48 +509,67 @@ public class HttpClientUtil {
 			String url,
 			String[] paramNames, String[] paramValues,
 			MultiPartFile[] filePartValues, OutputStream output) throws ClientProtocolException, IOException {
+		List<BasicNameValuePair> params = makeDoGetParamPairs(paramNames, paramValues);
+		return doBasicPostMultipart(
+				httpClient,
+				url, null,
+				makeDoGetParamPairs(paramNames, paramValues),
+				arrayToList(filePartValues), output
+		);
+	}
+
+	public static int doBasicPostMultipart(
+			HttpClient httpClient,
+			String url, Map<String, String> headers,
+			List<BasicNameValuePair> params,
+			List<MultiPartFile> filePartValues, OutputStream output
+	) throws ClientProtocolException, IOException {
 
 		MultipartEntity multipartEntity = new MultipartEntity(
 				HttpMultipartMode.BROWSER_COMPATIBLE);
 
 		// 封装请求参数
-		if(paramNames != null && paramValues != null) {
-			for (int i = 0; i < paramNames.length; i++) {
-				multipartEntity.addPart(paramNames[i], 
-						new StringBody(paramValues[i], DefaultCharset));
+		if(params != null) {
+			for(BasicNameValuePair pair : params) {
+				multipartEntity.addPart(
+						pair.getName(),
+						new StringBody(pair.getValue(), DefaultCharset)
+				);
 			}
 		}
-		
+
 		// 上传文件
 		if(filePartValues != null) {
-			MultiPartFile multiPartFile = null;
-			for (int i = 0; i < filePartValues.length; i++) {
-				multiPartFile = filePartValues[i]; 
-				
+			for(MultiPartFile multiPartFile : filePartValues) {
 				if(multiPartFile.isUseInputStream()) {
-					multipartEntity.addPart(multiPartFile.getName(), 
+					multipartEntity.addPart(multiPartFile.getName(),
 							new InputStreamBody(
-									multiPartFile.getInputStream(), 
+									multiPartFile.getInputStream(),
 									multiPartFile.getName()));
 				} else {
-					multipartEntity.addPart(multiPartFile.getName(), 
+					multipartEntity.addPart(multiPartFile.getName(),
 							new FileBody(multiPartFile.getFile()));
 				}
 			}
 		}
-	
-		return doMultipartPost(httpClient, url, multipartEntity, output);
+
+		return doMultipartPost(httpClient, url, headers, multipartEntity, output);
 	}
-	
+
 	public static int doMultipartPost(
 			HttpClient httpClient,
-			String url,
+			String url, Map<String, String> headers,
 			MultipartEntity multipartEntity, OutputStream output) throws ClientProtocolException, IOException {
 		// 使用HttpPost对象设置发送的URL路径
 		HttpPost request = new HttpPost(url);
 
 		try {
 			addPostMultipartHeaders(request);
+			if(headers != null) {
+				for(Map.Entry<String, String> kv : headers.entrySet()) {
+					request.addHeader(kv.getKey(), kv.getValue());
+				}
+			}
 
 			request.setEntity(multipartEntity);
 			HttpResponse response = httpClient.execute(request);
@@ -724,5 +752,17 @@ public class HttpClientUtil {
 	private static String urlComponentEncode(String strVal, String encode) throws UnsupportedEncodingException {
 		return URLEncoder.encode(strVal, encode).replaceAll("\\+", "%20");
 	}
-	
+
+	private static <T> List<T> arrayToList(T[] objs) {
+		if(objs == null) {
+			return null;
+		} else {
+			List<T> list = new ArrayList<T>();
+			for(T o : objs) {
+				list.add(o);
+			}
+			return list;
+		}
+	}
+
 }
