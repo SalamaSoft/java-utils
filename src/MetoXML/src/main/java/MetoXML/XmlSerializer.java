@@ -304,6 +304,10 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
                 	tagName = entry.getKey();
                 	
                 	classNode.index ++;
+
+                	if(objTmp == null) {
+                	    continue;
+                    }
                 } else {
                 	throw new RuntimeException("Not supported type:" + classNode.obj.getClass().getName());
                 }
