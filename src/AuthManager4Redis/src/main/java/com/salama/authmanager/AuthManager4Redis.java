@@ -9,6 +9,8 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import MetoXML.XmlSerializer;
+import org.apache.log4j.Logger;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -19,6 +21,8 @@ import com.salama.service.clouddata.core.AppException;
 import com.salama.service.clouddata.core.AuthUserInfo;
 
 public class AuthManager4Redis implements AppAuthUserDataManager, Closeable {
+	private final static Logger logger = Logger.getLogger(AuthManager4Redis.class);
+
 	private final static String COL_NAME_USER_ID = "userId";
 	private final static String COL_NAME_ROLE = "role";
 	private final static String COL_NAME_EXPIRING_TIME = "expiringTime";
@@ -53,6 +57,7 @@ public class AuthManager4Redis implements AppAuthUserDataManager, Closeable {
 	private int _jedisPoolMaxIdle = 20;
 	private int _jedisPoolMaxWait = 100;
 	private int _jedisPoolSoftMinEvictableIdleTimeMillis = 10000;
+	private boolean _jedisPoolTestOnBorrow = true;
 
 	public AuthManager4Redis(
 			String serverCd,
@@ -121,7 +126,7 @@ public class AuthManager4Redis implements AppAuthUserDataManager, Closeable {
 		_jedisPoolMaxIdle = Integer.parseInt(jedisPoolMaxIdle);
 		_jedisPoolMaxWait = Integer.parseInt(jedisPoolMaxWait);
 		_jedisPoolSoftMinEvictableIdleTimeMillis = Integer.parseInt(jedisPoolSoftMinEvictableIdleTimeMillis);
-		
+
 		JedisPoolConfig jedisConfig = new JedisPoolConfig();
 		jedisConfig.setMaxIdle(_jedisPoolMaxIdle);
 		
@@ -133,7 +138,7 @@ public class AuthManager4Redis implements AppAuthUserDataManager, Closeable {
 		jedisConfig.setMaxWaitMillis(_jedisPoolMaxWait);
 		
 		jedisConfig.setSoftMinEvictableIdleTimeMillis(_jedisPoolSoftMinEvictableIdleTimeMillis);
-		jedisConfig.setTestOnBorrow(false);
+		jedisConfig.setTestOnBorrow(_jedisPoolTestOnBorrow);
 
 		int iDbNum = 0;
 		if(dbNum != null && dbNum.length() > 0) {
@@ -147,6 +152,14 @@ public class AuthManager4Redis implements AppAuthUserDataManager, Closeable {
 				_jedisPoolMaxWait,
 				password,
 				iDbNum
+				);
+
+		logger.info("JedisPoolConfig ->"
+						+ " TestOnBorrow:" + _jedisPoolTestOnBorrow
+						+ " MaxIdle:" + _jedisPoolMaxIdle
+						+ " MaxTotal:" + _jedisPoolMaxActive
+						+ " MaxWaitMillis:" + _jedisPoolMaxWait
+						+ " SoftMinEvictableIdleTimeMillis:" + _jedisPoolSoftMinEvictableIdleTimeMillis
 				);
 	}
 	
