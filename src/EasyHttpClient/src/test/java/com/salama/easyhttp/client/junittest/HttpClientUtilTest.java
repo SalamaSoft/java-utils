@@ -7,7 +7,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import com.salama.easyhttp.client.SSLHttpClientUtil;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -26,7 +29,7 @@ import com.salama.easyhttp.client.MultiPartFile;
 public class HttpClientUtilTest {
 
 	@Test
-	public void testDoGetDianping() {
+	public void test1() {
 		for(int i = 0; i < 10; i++) {
 			testDoGet();
 		}

@@ -8,6 +8,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -123,8 +124,8 @@ public class HttpClientUtil {
 	
 	public static void setTimeout(int connectionPooltimeoutMS,
 			int httpConnectionTimeoutMS, int httpRequestTimeoutMS) {
-		//ConnManagerParams.setTimeout(httpParams, connectionPooltimeoutMS);
-		
+		ConnManagerParams.setTimeout(httpParams, connectionPooltimeoutMS);
+
 		/* 连接超时 */
 		HttpConnectionParams.setConnectionTimeout(httpParams,
 				httpConnectionTimeoutMS);

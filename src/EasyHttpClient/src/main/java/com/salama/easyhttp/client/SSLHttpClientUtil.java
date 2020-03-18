@@ -3,6 +3,7 @@ package com.salama.easyhttp.client;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -170,7 +171,7 @@ public class SSLHttpClientUtil {
 	
 	public void setTimeout(int connectionPooltimeoutMS,
 			int httpConnectionTimeoutMS, int httpRequestTimeoutMS) {
-		//ConnManagerParams.setTimeout(httpParams, connectionPooltimeoutMS);
+		ConnManagerParams.setTimeout(_httpParams, connectionPooltimeoutMS);
 		
 		/* 连接超时 */
 		HttpConnectionParams.setConnectionTimeout(_httpParams,
