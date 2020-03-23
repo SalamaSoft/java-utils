@@ -4,10 +4,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.Socket;
 import java.security.KeyStore;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -74,7 +76,6 @@ public class SSLHttpClientUtilTest {
 					null, null,null,
 					SSLHttpClientUtil.TrustStrategyTrustAnyServer
 			);
-
 			sslHttpClientUtil.setTimeout(
 					3*1000,
 					10*1000,
@@ -176,6 +177,54 @@ public class SSLHttpClientUtilTest {
 			}
 
 			Thread.sleep(30L * 1000);
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void test6() {
+		String url = "https://47.111.217.78/test/test1?sleep=500";
+
+		try {
+			SSLHttpClientUtil sslHttpClientUtil = new SSLHttpClientUtil(
+					null, null,null,
+					SSLHttpClientUtil.TrustStrategyTrustAnyServer
+			);
+
+			final int maxTotal = 16;
+
+			sslHttpClientUtil.getConnectionManager().setDefaultMaxPerRoute(maxTotal);
+			sslHttpClientUtil.getConnectionManager().setMaxTotal(maxTotal);
+
+			sslHttpClientUtil.setTimeout(
+					2*1000,
+					6 * 1000,
+					6*1000
+			);
+
+			ExecutorService workPool = Executors.newFixedThreadPool(8);
+			for(int i = 0; i < 8; i++) {
+				workPool.execute(() -> {
+					final long opBegin = System.currentTimeMillis();
+
+					try {
+						//String resp = sslHttpClientUtil.doGet(url, (String[]) null, null);
+						String resp = doGet(sslHttpClientUtil.getHttpClient(), url, null, null);
+						System.out.println(" cost(ms):" + (System.currentTimeMillis() - opBegin)
+								+ " resp:" + resp
+						);
+					} catch (Throwable e) {
+						System.out.println(" cost(ms):" + (System.currentTimeMillis() - opBegin)
+								+ " " + e.getClass().getName() + " " + e.getMessage()
+						);
+					}
+				});
+			}
+
+			Thread.sleep(10L * 1000);
+
+			sslHttpClientUtil.getConnectionManager().closeIdleConnections(60L * 1000, TimeUnit.MILLISECONDS);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
