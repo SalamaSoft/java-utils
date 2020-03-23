@@ -184,7 +184,7 @@ public class SSLHttpClientUtilTest {
 
 	@Test
 	public void test6() {
-		String url = "https://47.111.217.78/test/test1?sleep=500";
+		String url = "https://127.0.0.1/test/test1?sleep=500";
 
 		try {
 			SSLHttpClientUtil sslHttpClientUtil = new SSLHttpClientUtil(
