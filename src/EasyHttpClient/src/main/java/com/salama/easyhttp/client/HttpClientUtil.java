@@ -7,6 +7,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.scheme.PlainSocketFactory;
@@ -23,10 +24,7 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.params.*;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
@@ -72,6 +70,8 @@ public class HttpClientUtil {
 	static {
 		//Http setting -----------------------------------------------
 		httpParams = new BasicHttpParams();
+		//httpParams.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, true);
+
 		// 设置一些基本参数
 		HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1);
 		HttpProtocolParams.setContentCharset(httpParams, DEFAULT_CHARSET);
@@ -125,6 +125,7 @@ public class HttpClientUtil {
 	public static void setTimeout(int connectionPooltimeoutMS,
 			int httpConnectionTimeoutMS, int httpRequestTimeoutMS) {
 		ConnManagerParams.setTimeout(httpParams, connectionPooltimeoutMS);
+		httpParams.setLongParameter(ClientPNames.CONN_MANAGER_TIMEOUT, connectionPooltimeoutMS);
 
 		/* 连接超时 */
 		HttpConnectionParams.setConnectionTimeout(httpParams,

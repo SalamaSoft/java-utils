@@ -1,24 +1,22 @@
 package com.salama.easyhttp.client.junittest;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.Socket;
-import java.security.KeyStore;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
+import com.salama.easyhttp.client.HttpClientUtil;
+import com.salama.easyhttp.client.SSLHttpClientUtil;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.message.BasicNameValuePair;
 import org.junit.Test;
 
-import com.salama.easyhttp.client.HttpClientUtil;
-import com.salama.easyhttp.client.SSLHttpClientUtil;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.security.KeyStore;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class SSLHttpClientUtilTest {
 
@@ -184,7 +182,7 @@ public class SSLHttpClientUtilTest {
 
 	@Test
 	public void test6() {
-		String url = "https://127.0.0.1/test/test1?sleep=500";
+		String url = "https://47.111.217.78/test/test1?sleep=2000";
 
 		try {
 			SSLHttpClientUtil sslHttpClientUtil = new SSLHttpClientUtil(
@@ -192,7 +190,7 @@ public class SSLHttpClientUtilTest {
 					SSLHttpClientUtil.TrustStrategyTrustAnyServer
 			);
 
-			final int maxTotal = 16;
+			final int maxTotal = 1;
 
 			sslHttpClientUtil.getConnectionManager().setDefaultMaxPerRoute(maxTotal);
 			sslHttpClientUtil.getConnectionManager().setMaxTotal(maxTotal);

@@ -3,6 +3,7 @@ package com.salama.easyhttp.client;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.params.ClientPNames;
 import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -13,10 +14,7 @@ import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.params.*;
 
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
@@ -147,6 +145,8 @@ public class SSLHttpClientUtil {
 		
 		//Http setting -----------------------------------------------
 		_httpParams = new BasicHttpParams();
+		//_httpParams.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, true);
+
 		// 设置一些基本参数
 		HttpProtocolParams.setVersion(_httpParams, HttpVersion.HTTP_1_1);
 		HttpProtocolParams.setContentCharset(_httpParams, DEFAULT_CHARSET);
@@ -172,7 +172,8 @@ public class SSLHttpClientUtil {
 	public void setTimeout(int connectionPooltimeoutMS,
 			int httpConnectionTimeoutMS, int httpRequestTimeoutMS) {
 		ConnManagerParams.setTimeout(_httpParams, connectionPooltimeoutMS);
-		
+		_httpParams.setLongParameter(ClientPNames.CONN_MANAGER_TIMEOUT, connectionPooltimeoutMS);
+
 		/* 连接超时 */
 		HttpConnectionParams.setConnectionTimeout(_httpParams,
 				httpConnectionTimeoutMS);
