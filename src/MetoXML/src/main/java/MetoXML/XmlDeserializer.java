@@ -5,10 +5,7 @@ import MetoXML.Base.XmlNode;
 import MetoXML.Base.XmlNodeAttribute;
 import MetoXML.Base.XmlParseException;
 import MetoXML.Cast.BaseTypesMapping;
-import MetoXML.Util.Base64FormatException;
-import MetoXML.Util.ClassFinder;
-import MetoXML.Util.DataClassFinder;
-import MetoXML.Util.ITreeNode;
+import MetoXML.Util.*;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -26,9 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
+public class XmlDeserializer extends AbstractReflectInfoCachedSerializer2 {
 	static {
-		System.out.println("XmlDeserializer v2.0.2. lastModified:20171208");
+		System.out.println("XmlDeserializer v2.2.0. lastModified:20200724");
 	}
 	
 	public static final Charset DefaultCharset = Charset.forName("UTF-8");
@@ -294,9 +291,9 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
                 //parent is object
 				try {
 					//PropertyDescriptor pInf = new PropertyDescriptor(((XmlNode)node).getName(), nodeInfo.objType);
-					PropertyDescriptor pInf = findPropertyDescriptor(((XmlNode)node).getName(), nodeInfo.objType);
+					CachedPropertyDescriptor pInf = findPropertyDescriptor(((XmlNode)node).getName(), nodeInfo.objType);
 					
-					Class<?> currentObjType = pInf.getPropertyType();
+					Class<?> currentObjType = pInf._propertyType;
 
 					if (isLeafNode)
 					{
@@ -394,8 +391,8 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
                 //Parent is object
             	try {
 					//PropertyDescriptor property = new PropertyDescriptor(((XmlNode)node).getName(), parentNodeInfo.objType);
-            		PropertyDescriptor property = findPropertyDescriptor(((XmlNode)node).getName(), parentNodeInfo.objType);
-					property.getWriteMethod().invoke(parentNodeInfo.obj, nodeInfo.obj);
+            		CachedPropertyDescriptor property = findPropertyDescriptor(((XmlNode)node).getName(), parentNodeInfo.objType);
+					property._writeMethod.invoke(parentNodeInfo.obj, nodeInfo.obj);
 				} catch (IllegalArgumentException e) {
 					throw new RuntimeException(e);
 				} catch (IntrospectionException e) {
@@ -578,8 +575,8 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
         _nodeInfoStack.add(nodeInf);
     }
 
-    protected void SetPropertyValue(Object obj, PropertyDescriptor property, String valueStr) {
-    	Type type = property.getPropertyType();
+    protected void SetPropertyValue(Object obj, CachedPropertyDescriptor property, String valueStr) {
+    	Type type = property._propertyType;
     	Class<?> cls = (Class<?>) type;
 
     	try {
@@ -589,12 +586,12 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
 			} else if(cls.isArray() 
 					&& cls.getComponentType().getName().equals(byte.class.getName())) {
 				//byte[]
-				property.getWriteMethod().invoke(obj, BaseTypesMapping.DecodeBase64(valueStr));
+				property._writeMethod.invoke(obj, BaseTypesMapping.DecodeBase64(valueStr));
 			} else if(IsList(cls)) {
             	if(cls.isInterface()) {
-    				property.getWriteMethod().invoke(obj, new ArrayList());
+    				property._writeMethod.invoke(obj, new ArrayList());
             	} else {
-    				property.getWriteMethod().invoke(obj, cls.newInstance());
+    				property._writeMethod.invoke(obj, cls.newInstance());
             	}
             /* Modified on 2018/07/06 -> duplicated code
 			} else if(BaseTypesMapping.IsSupportedBaseType(cls)) {
@@ -602,7 +599,7 @@ public class XmlDeserializer extends AbstractReflectInfoCachedSerializer {
 			*/
 			} else {
 				//Do nothing. Modified on 2018/07/06 ->  throw error
-                throw new RuntimeException("Unsupported type: " + cls.getName() + " property:" + property.getName());
+                throw new RuntimeException("Unsupported type: " + cls.getName() + " property:" + property._name);
 			}
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);

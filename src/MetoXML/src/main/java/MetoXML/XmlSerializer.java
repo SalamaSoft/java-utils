@@ -21,9 +21,10 @@ import MetoXML.Base.XmlDocument;
 import MetoXML.Base.XmlNode;
 import MetoXML.Base.XmlNodeAttribute;
 import MetoXML.Cast.BaseTypesMapping;
+import MetoXML.Util.CachedPropertyDescriptor;
 import MetoXML.Util.ITreeNode;
 
-public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
+public class XmlSerializer extends AbstractReflectInfoCachedSerializer2 {
 	public static final Charset DefaultCharset = Charset.forName("UTF-8");
 
 	//public static final String TAG_NAME_ARRAY = "Array";
@@ -165,7 +166,7 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
 
         XmlNode nodeTmp = null;
         String tagName = null;
-        PropertyDescriptor pInf = null;
+        CachedPropertyDescriptor pInf = null;
         NodeInfoData classNode = null;
         XmlNode prevNode = null;
         int arrayLen = 0;
@@ -220,7 +221,7 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
         {
             //Data
             //PropertyDescriptor[] properties = Introspector.getBeanInfo(typeOfObj).getPropertyDescriptors();
-        	PropertyDescriptor[] properties = findPropertyDescriptorArray(typeOfObj);
+        	CachedPropertyDescriptor[] properties = findPropertyDescriptorArray(typeOfObj);
             if (properties == null || properties.length == 0) return rootNode;
 
             classNodeStack.add(new NodeInfoData(obj, 0, rootNode, properties));
@@ -270,9 +271,9 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
                     pInf = classNode.propInfArray[classNode.index];
                     classNode.index++;
 
-                    if (pInf.getReadMethod() != null && pInf.getWriteMethod() != null)
+                    if (pInf._readMethod != null && pInf._writeMethod != null)
                     {
-                        objTmp = pInf.getReadMethod().invoke(classNode.obj);
+                        objTmp = pInf._readMethod.invoke(classNode.obj);
 
                         if (objTmp == null)
                         {
@@ -547,8 +548,8 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
     }
     */
 
-    protected static String GetPropertyDisplayName(PropertyDescriptor property, boolean isMakeFirstCharUpperCase) {
-    	String name = property.getDisplayName();
+    protected static String GetPropertyDisplayName(CachedPropertyDescriptor property, boolean isMakeFirstCharUpperCase) {
+    	String name = property._displayName;
     	if(isMakeFirstCharUpperCase) {
         	name = name.substring(0, 1).toUpperCase() + name.substring(1);
     	}
@@ -574,7 +575,7 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
         /// </summary>
         public Object obj = null;
 
-        public PropertyDescriptor[] propInfArray = null;
+        public CachedPropertyDescriptor[] propInfArray = null;
         
         public Map.Entry<String, Object>[] mapEntryArray = null;
 
@@ -602,7 +603,7 @@ public class XmlSerializer extends AbstractReflectInfoCachedSerializer{
             this.type = type;
         }
 
-        public NodeInfoData(Object objForProperties, int indexInProperties, XmlNode nodeOfObj, PropertyDescriptor[] propertyInfoArray)
+        public NodeInfoData(Object objForProperties, int indexInProperties, XmlNode nodeOfObj, CachedPropertyDescriptor[] propertyInfoArray)
         {
             this.type = NodeType.Property;
             this.obj = objForProperties;

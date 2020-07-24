@@ -16,6 +16,7 @@ import java.util.HashMap;
 import MetoXML.Util.Base64Decoder;
 import MetoXML.Util.Base64Encoder;
 import MetoXML.Util.Base64FormatException;
+import MetoXML.Util.CachedPropertyDescriptor;
 
 public class BaseTypesMapping {
     //public final static String DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.SSS00ZZ:ZZ";
@@ -362,12 +363,22 @@ public class BaseTypesMapping {
 			return cls.cast(valueStr);
 		}
 	}
+
     public static void SetPropertyValueOfPrimitiveType(Object obj, PropertyDescriptor property, String valueStr) 
     	throws IllegalAccessException, InvocationTargetException, ParseException {
     	Type type = property.getPropertyType();
     	//Class cls = (Class) type;
     	
     	property.getWriteMethod().invoke(obj, Convert(type, valueStr));
+    }
+
+
+    public static void SetPropertyValueOfPrimitiveType(Object obj, CachedPropertyDescriptor property, String valueStr)
+            throws IllegalAccessException, InvocationTargetException, ParseException {
+        Type type = property._propertyType;
+        //Class cls = (Class) type;
+
+        property._writeMethod.invoke(obj, Convert(type, valueStr));
     }
 
 }
