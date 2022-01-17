@@ -71,6 +71,7 @@ public class HttpClientUtil {
 		//Http setting -----------------------------------------------
 		httpParams = new BasicHttpParams();
 		//httpParams.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, true);
+		httpParams.setBooleanParameter(CoreConnectionPNames.SO_KEEPALIVE, true);
 
 		// 设置一些基本参数
 		HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1);
